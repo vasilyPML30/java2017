@@ -1,28 +1,30 @@
 package net.netau.vasyoid;
 
+/**
+ * Main class with simple tests.
+ */
 public class Main {
 
-    private static void print(String value) {
-        if (value == null) {
-            System.out.println("null");
-        } else {
-            System.out.println(value);
-        }
-    }
-
-    public static void main(String[] args) {
+    /**
+     * Some simple tests.
+     * Just to make sure it works sometimes.
+     *
+     * @param args not used.
+     */
+    public static void main(String[] args) throws AssertionError {
         HashTable table = new HashTable();
-        print(table.put("Mama", "Papa"));
-        print(table.put("Mama", "Mama"));
-        print(table.get("Mama"));
-        print(table.contains("Mama") ? "contains" : "doesn't contain");
-        print(table.remove("Mama"));
-        print(table.remove("Mama"));
-        print(table.contains("Mama") ? "contains" : "doesn't contain");
+        boolean success =  table.put("Mama", "Papa") == null &&
+            table.put("Mama", "Mama").equals("Papa") &&
+            table.contains("Mama") &&
+            table.get("Mama").equals("Mama") &&
+            table.remove("Mama").equals("Mama") &&
+            table.remove("Mama") == null &&
+            !table.contains("Mama");
         for (int i = 0; i < 20; i++) {
             table.put(String.valueOf(i), String.valueOf(i * 100));
-            print(String.valueOf(table.size()));
+            success &= table.size() == i + 1;
         }
+        System.out.println(success ? "tests passed" : "tests failed");
         table.clear();
     }
 }
