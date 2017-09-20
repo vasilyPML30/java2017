@@ -5,6 +5,7 @@ package net.netau.vasyoid;
  * Supports automatic expansion.
  */
 public class HashTable {
+
     private LinkedList[] data;
     private int size, capacity;
 
@@ -31,7 +32,7 @@ public class HashTable {
     }
 
     private LinkedList getList(String key) {
-        return data[key.hashCode() % capacity];
+        return data[Math.abs(key.hashCode()) % capacity];
     }
 
     /**

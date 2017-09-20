@@ -9,18 +9,6 @@ public class LinkedList {
 
     private ListNode head;
 
-    private class ListNode {
-        private ListNode previous, next;
-        private String key, value;
-
-        private ListNode(String key, String value) {
-            this.key = key;
-            this.value = value;
-            this.previous = this.next = this;
-        }
-
-    }
-
     private ListNode findNode(String key) {
         for (ListNode node = head.next; node.key != null; node = node.next) {
             if (key.equals(node.key)) {
@@ -117,5 +105,17 @@ public class LinkedList {
         } else {
             return null;
         }
+    }
+
+    private class ListNode {
+        private ListNode previous, next;
+        private String key, value;
+
+        private ListNode(String key, String value) {
+            this.key = key;
+            this.value = value;
+            this.previous = this.next = this;
+        }
+
     }
 }
