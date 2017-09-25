@@ -70,7 +70,7 @@ public class LinkedList {
      */
     public String get(String key) {
         ListNode node = findNode(key);
-        return (node != null ? node.key : null);
+        return (node != null ? node.value : null);
     }
 
     /**

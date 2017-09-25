@@ -13,11 +13,11 @@ public class Main {
      */
     public static void main(String[] args) throws AssertionError {
         HashTable table = new HashTable();
-        boolean success =  table.put("Mama", "Papa") == null &&
-            table.put("Mama", "Mama").equals("Papa") &&
+        boolean success =  table.put("Mama", "Mapa") == null &&
+            table.put("Mama", "Papa").equals("Mapa") &&
             table.contains("Mama") &&
-            table.get("Mama").equals("Mama") &&
-            table.remove("Mama").equals("Mama") &&
+            table.get("Mama").equals("Papa") &&
+            table.remove("Mama").equals("Papa") &&
             table.remove("Mama") == null &&
             !table.contains("Mama");
         for (int i = 0; i < 20; i++) {
