@@ -3,7 +3,17 @@ package net.netau.vasyoid;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * This class implements tests for HashTable class.
+ * All public methods and some special cases are tested.
+ */
 class HashTableTest {
+
+    /**
+     * Tests HashTable.size() method.
+     * Cases tested: empty table, added one element, two elements,
+     * removed one element, table cleared.
+     */
     @Test
     void testSize() {
         HashTable table = new HashTable();
@@ -14,18 +24,27 @@ class HashTableTest {
         assertEquals(2, table.size());
         table.remove("key2");
         assertEquals(1, table.size());
-        table.remove("key");
+        table.clear();
         assertEquals(0, table.size());
     }
 
+    /**
+     * Tests HashTable.contains() method.
+     * Cases tested: empty table, existing key, not existing key.
+     */
     @Test
     void testContains() {
         HashTable table = new HashTable();
         assertFalse(table.contains("key"));
         table.put("key", "value");
         assertTrue(table.contains("key"));
+        assertFalse(table.contains("key2"));
     }
 
+    /**
+     * Tests HashTable.get() method.
+     * Cases tested: not existing key, existing key.
+     */
     @Test
     void testGet() {
         HashTable table = new HashTable();
@@ -34,6 +53,10 @@ class HashTableTest {
         assertEquals("value", table.get("key"));
     }
 
+    /**
+     * Tests HashTable.put() method.
+     * Cases tested: new key, existing key.
+     */
     @Test
     void testPut() {
         HashTable table = new HashTable();
@@ -44,6 +67,10 @@ class HashTableTest {
         assertEquals("value2", table.get("key"));
     }
 
+    /**
+     * Tests HashTable.remove() method.
+     * Cases tested: not existing key, existing key, previously removed key.
+     */
     @Test
     void testRemove() {
         HashTable table = new HashTable();
@@ -54,6 +81,10 @@ class HashTableTest {
         assertNull(table.remove("key"));
     }
 
+    /**
+     * Tests HashTable.clear() method.
+     * Cases tested: table with two elements, empty table.
+     */
     @Test
     void testClear() {
         HashTable table = new HashTable();
@@ -65,6 +96,9 @@ class HashTableTest {
         assertEquals(0, table.size());
     }
 
+    /**
+     * Case when two elements' hash codes are equal.
+     */
     @Test
     void testCollision() {
         HashTable table = new HashTable();
@@ -75,6 +109,9 @@ class HashTableTest {
         assertEquals("value2", table.get("Ea"));
     }
 
+    /**
+     * Case when hash table rebuilds itself twice.
+     */
     @Test
     void testRebuild() {
         HashTable table = new HashTable();
