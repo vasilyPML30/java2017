@@ -1,5 +1,6 @@
 package net.netau.vasyoid;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
@@ -22,19 +23,19 @@ class MatrixTest {
     @Test
     void testGetSpiralizedArray() {
         int[] elements = {1, 2, 3,
-                          4, 5, 6,
-                          7, 8, 9};
+                4, 5, 6,
+                7, 8, 9};
         Matrix matrix = new Matrix(3, elements);
         elements = new int[] {5, 4, 7, 8, 9, 6, 3, 2, 1};
         assertArrayEquals(elements, matrix.getSpiralizedArray());
         elements = new int[] {1,  2,  3,  4,  5,
-                              6,  7,  8,  9,  10,
-                              11, 12, 13, 14, 15,
-                              16, 17, 18, 19, 20,
-                              21, 22, 23, 24, 25};
+                6,  7,  8,  9,  10,
+                11, 12, 13, 14, 15,
+                16, 17, 18, 19, 20,
+                21, 22, 23, 24, 25};
         matrix = new Matrix(5, elements);
         elements = new int[] {13, 12, 17, 18, 19, 14, 9, 8, 7, 6, 11, 16,
-                              21, 22, 23, 24, 25, 20, 15, 10, 5, 4, 3, 2, 1};
+                21, 22, 23, 24, 25, 20, 15, 10, 5, 4, 3, 2, 1};
         assertArrayEquals(elements, matrix.getSpiralizedArray());
     }
 
