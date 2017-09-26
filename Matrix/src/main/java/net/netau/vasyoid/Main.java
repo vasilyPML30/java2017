@@ -2,6 +2,9 @@ package net.netau.vasyoid;
 
 import java.util.Random;
 
+/**
+ * The main class to show what Matrix method return.
+ */
 public class Main {
 
     private static void printMatrix(int size, int[] matrix) {
@@ -21,6 +24,11 @@ public class Main {
         System.out.println("\n");
     }
 
+    /**
+     * The main function.
+     * A random matrix is created, output in a normal and a spiral ways and with sorted columns.
+     * @param args not used
+     */
     public static void main(String[] args) {
         final int size = 5;
         int[] data = new int[size * size];

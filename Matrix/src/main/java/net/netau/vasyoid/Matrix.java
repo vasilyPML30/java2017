@@ -1,11 +1,21 @@
 package net.netau.vasyoid;
 
+/**
+ * A class of matrices.
+ * Stores a 2-dimensional array of integer values.
+ * A matrix can be presented as an array (successively or by a spiral).
+ * Columns can be sorted by their first values.
+ */
 public class Matrix {
 
     private int[][] data;
     private int size;
 
-    public Matrix(int size) {
+    /**
+     * Creates a matrix of wanted size filled with zeros.
+     * @param size size of the matrix.
+     */
+    public Matrix(int size) throws IllegalArgumentException {
         if (size <= 0) {
             throw new IllegalArgumentException("matrix size must be positive");
         } else if (size % 2 == 0) {
@@ -15,7 +25,12 @@ public class Matrix {
         data = new int[size][size];
     }
 
-    public Matrix(int size, int[] elements) {
+    /**
+     * Creates a matrix filled with values from an array.
+     * @param size size of the matrix.
+     * @param elements array of values to fill tje matrix with.
+     */
+    public Matrix(int size, int[] elements) throws IllegalArgumentException {
         this(size);
         if (size * size != elements.length) {
             throw new IllegalArgumentException("matrix size and number of elements do not match");
@@ -27,6 +42,10 @@ public class Matrix {
         }
     }
 
+    /**
+     * Presents the matrix as an array of successive elements.
+     * @return array of elements.
+     */
     public int[] getArray() {
         int[] result = new int[size * size];
         for (int row = 0; row < size; row++) {
@@ -37,6 +56,11 @@ public class Matrix {
         return result;
     }
 
+    /**
+     * Presents the matrix as an array of elements ordered by spiral
+     * with the beginning at the central cell.
+     * @return array of elements.
+     */
     public int[] getSpiralizedArray() {
         int[] result = new int[size * size];
         int curRow = size / 2;
@@ -62,6 +86,9 @@ public class Matrix {
         return result;
     }
 
+    /**
+     * Sorts the columns of the matrix by their first elements.
+     */
     public void sortColumns() {
         java.util.Arrays.sort(data, new java.util.Comparator<int[]>() {
             public int compare(int[] a, int[] b) {

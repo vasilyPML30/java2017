@@ -6,8 +6,16 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
+/**
+ * The class provides unit tests for the Matrix class public methods
+ * and some exceptional situations.
+ */
 class MatrixTest {
 
+    /**
+     * Tests Matrix.getArray() method.
+     * Cases: matrices of odd sizes between 1 and 9.
+     */
     @Test
     void testGetArray() {
         for (int size = 1; size < 10; size += 2) {
@@ -20,11 +28,15 @@ class MatrixTest {
         }
     }
 
+    /**
+     * Tests Matrix.getSpiralizedArray() method.
+     * Cases: Matrices 3x3 and 5x5.
+     */
     @Test
     void testGetSpiralizedArray() {
         int[] elements = {1, 2, 3,
-                4, 5, 6,
-                7, 8, 9};
+                          4, 5, 6,
+                          7, 8, 9};
         Matrix matrix = new Matrix(3, elements);
         elements = new int[] {5, 4, 7, 8, 9, 6, 3, 2, 1};
         assertArrayEquals(elements, matrix.getSpiralizedArray());
@@ -39,6 +51,10 @@ class MatrixTest {
         assertArrayEquals(elements, matrix.getSpiralizedArray());
     }
 
+    /**
+     * Tests Matrix.sortColumns() method.
+     * Cases: columns in reverse order and in random order.
+     */
     @Test
     void testSortColumns() {
         int[] elements = new int[25];
@@ -66,6 +82,10 @@ class MatrixTest {
         }
     }
 
+    /**
+     * Checks what exceptions are thrown when an illegal argument is passed into constructors.
+     * Cases: negative size, even size, different size and number of elements.
+     */
     @Test
     void testExceptions() {
         assertThrows(IllegalArgumentException.class, () -> new Matrix(-3), "matrix size must be positive");
