@@ -57,6 +57,20 @@ public class Matrix {
     }
 
     /**
+     * Gets the matrix as a 2-dimensional array.
+     * @return matrix.
+     */
+    public int[][] getMatrix() {
+        int[][] result = new int[size][size];
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                result[i][j] = data[j][i];
+            }
+        }
+        return result;
+    }
+
+    /**
      * Presents the matrix as an array of elements ordered by spiral
      * with the beginning at the central cell.
      * @return array of elements.

@@ -13,6 +13,28 @@ import java.util.Random;
 public class MatrixTest {
 
     /**
+     * Tests Matrix.getMatrix() method.
+     * Cases: matrices of odd sizes between 1 and 9.
+     */
+    @Test
+    public void testGetMatrix() {
+        for (int size = 1; size < 10; size += 2) {
+            int[] elements = new int[size * size];
+            for (int i = 0; i < size * size; i++) {
+                elements[i] = i;
+            }
+            int[][] matrixElements = new int[size][size];
+            for (int i = 0; i < size; i++) {
+                for (int j = 0; j < size; j++) {
+                    matrixElements[i][j] = i * size + j;
+                }
+            }
+            Matrix matrix = new Matrix(size, elements);
+            assertArrayEquals(matrixElements, matrix.getMatrix());
+        }
+    }
+
+    /**
      * Tests Matrix.getArray() method.
      * Cases: matrices of odd sizes between 1 and 9.
      */
@@ -108,4 +130,17 @@ public class MatrixTest {
         }
     }
 
+    /**
+     * Checks that exception is thrown when size and number of elements do not match.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testSizeAndNumberNotMatch() {
+        int[] elements = new int[8];
+        try {
+            new Matrix(3, elements);
+        } catch(IllegalArgumentException e) {
+            assertEquals("matrix size and number of elements do not match", e.getMessage());
+            throw e;
+        }
+    }
 }

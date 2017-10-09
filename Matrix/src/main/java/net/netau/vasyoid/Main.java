@@ -7,10 +7,10 @@ import java.util.Random;
  */
 public class Main {
 
-    private static void printMatrix(int size, int[] matrix) {
-        for (int row = 0; row < size; row++) {
-            for (int col = 0; col < size; col++) {
-                System.out.print(matrix[row * size + col] + " ");
+    private static void printMatrix(int[][] matrix) {
+        for (int[] row : matrix) {
+            for (int element : row) {
+                System.out.print(element + " ");
             }
             System.out.println();
         }
@@ -37,9 +37,9 @@ public class Main {
             data[i] = random.nextInt(size * size);
         }
         Matrix matrix = new Matrix(size, data);
-        printMatrix(size, matrix.getArray());
+        printMatrix(matrix.getMatrix());
         printArray(matrix.getSpiralizedArray());
         matrix.sortColumns();
-        printMatrix(size, matrix.getArray());
+        printMatrix(matrix.getMatrix());
     }
 }
