@@ -1,8 +1,8 @@
 package net.netau.vasyoid;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 import java.util.Random;
 
@@ -10,14 +10,14 @@ import java.util.Random;
  * The class provides unit tests for the Matrix class public methods
  * and some exceptional situations.
  */
-class MatrixTest {
+public class MatrixTest {
 
     /**
      * Tests Matrix.getArray() method.
      * Cases: matrices of odd sizes between 1 and 9.
      */
     @Test
-    void testGetArray() {
+    public void testGetArray() {
         for (int size = 1; size < 10; size += 2) {
             int[] elements = new int[size * size];
             for (int i = 0; i < size * size; i++) {
@@ -33,7 +33,7 @@ class MatrixTest {
      * Cases: Matrices 3x3 and 5x5.
      */
     @Test
-    void testGetSpiralizedArray() {
+    public void testGetSpiralizedArray() {
         int[] elements = {1, 2, 3,
                           4, 5, 6,
                           7, 8, 9};
@@ -56,7 +56,7 @@ class MatrixTest {
      * Cases: columns in reverse order and in random order.
      */
     @Test
-    void testSortColumns() {
+    public void testSortColumns() {
         int[] elements = new int[25];
         for (int i = 0; i < 25; i++) {
             elements[i] = 25 - i;
@@ -83,16 +83,29 @@ class MatrixTest {
     }
 
     /**
-     * Checks what exceptions are thrown when an illegal argument is passed into constructors.
-     * Cases: negative size, even size, different size and number of elements.
+     * Checks that exception is thrown when trying to create a matrix of negative size.
      */
-    @Test
-    void testExceptions() {
-        assertThrows(IllegalArgumentException.class, () -> new Matrix(-3), "matrix size must be positive");
-        assertThrows(IllegalArgumentException.class, () -> new Matrix(4), "matrix size must be odd");
-        int[] elements = new int[5];
-        assertThrows(IllegalArgumentException.class, () ->
-                new Matrix(5, elements), "matrix size and number of elements do not match");
+    @Test(expected = IllegalArgumentException.class)
+    public void testSizeMustBePositive() {
+        try {
+            new Matrix(-3);
+        } catch (IllegalArgumentException e) {
+            assertEquals("matrix size must be positive", e.getMessage());
+            throw e;
+        }
+    }
+
+    /**
+     * Checks that exception is thrown when trying to create a matrix of even size.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testSizeMustBeOdd() {
+        try {
+            new Matrix(4);
+        } catch(IllegalArgumentException e) {
+            assertEquals("matrix size must be odd", e.getMessage());
+            throw e;
+        }
     }
 
 }
