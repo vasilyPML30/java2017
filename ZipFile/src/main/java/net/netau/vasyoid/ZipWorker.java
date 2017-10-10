@@ -1,12 +1,13 @@
 package net.netau.vasyoid;
 
-import com.sun.istack.internal.NotNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
 
 /**
  * This class contains methods that find zip archives and extract specified entries from them.
@@ -41,12 +42,10 @@ public class ZipWorker {
      * @param input zip input stream which contains the entry.
      * @param entry entry to extract.
      * @param outFolder directory where to extract.
-     * @throws IOException
      */
-    public static void unzipEntry(@NotNull ZipInputStream input,
+    private static void unzipEntry(@NotNull ZipInputStream input,
                                   @NotNull ZipEntry entry,
-                                  @NotNull File outFolder)
-            throws IOException {
+                                  @NotNull File outFolder) {
         File outFile = new File(outFolder, entry.getName());
         outFile.getParentFile().mkdirs();
         try (OutputStream output = new FileOutputStream(outFile)) {
@@ -55,6 +54,8 @@ public class ZipWorker {
             while ((bytesRead = input.read(buffer)) != -1) {
                 output.write(buffer, 0, bytesRead);
             }
+        } catch (IOException exception) {
+            System.out.println("Error extracting file: " + exception.getMessage());
         }
     }
 
@@ -75,11 +76,7 @@ public class ZipWorker {
                 if (entry.isDirectory() || !regex.matcher(entry.getName()).matches()) {
                     continue;
                 }
-                try {
-                    unzipEntry(input, entry, outFolder);
-                } catch (IOException exception) {
-                    System.out.println("Error extracting file: " + exception.getMessage());
-                }
+                unzipEntry(input, entry, outFolder);
             }
         } catch (IOException exception) {
             System.out.println("Error unzipping archive: " + exception.getMessage());
