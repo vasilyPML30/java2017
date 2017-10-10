@@ -1,15 +1,27 @@
 package net.netau.vasyoid;
 
+import com.sun.istack.internal.NotNull;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+/**
+ * This class contains methods that find zip archives and extract specified entries from them.
+ */
 public class ZipWorker {
     private static final int BUFFERSIZE = 1024;
 
-    public static ArrayList<File> listArchives(File directory, ArrayList<File> result) {
+    /**
+     * Recursively finds all zip archives in a specified directory.
+     * @param directory place where to search.
+     * @param result initial list.
+     * @return list of found file descriptors.
+     */
+    public static @NotNull ArrayList<File> listArchives(@NotNull File directory,
+                                                        @NotNull ArrayList<File> result) {
         File[] files = directory.listFiles();
         if (files == null) {
             return result;
@@ -24,7 +36,16 @@ public class ZipWorker {
         return result;
     }
 
-    public static void unzipEntry(ZipInputStream input, ZipEntry entry, File outFolder)
+    /**
+     * Extracts a specified entry from an specified input to a specified directory.
+     * @param input zip input stream which contains the entry.
+     * @param entry entry to extract.
+     * @param outFolder directory where to extract.
+     * @throws IOException
+     */
+    public static void unzipEntry(@NotNull ZipInputStream input,
+                                  @NotNull ZipEntry entry,
+                                  @NotNull File outFolder)
             throws IOException {
         File outFile = new File(outFolder, entry.getName());
         outFile.getParentFile().mkdirs();
@@ -37,7 +58,15 @@ public class ZipWorker {
         }
     }
 
-    public static void unzipByRegex(File inFile, File outFolder, Pattern regex) {
+    /**
+     * Extracts all files matching a given pattern.
+     * @param inFile archive with files to extract.
+     * @param outFolder directory where to extract.
+     * @param regex only files matching this pattern will be extracted.
+     */
+    public static void unzipByRegex(@NotNull File inFile,
+                                    @NotNull File outFolder,
+                                    @NotNull Pattern regex) {
         try (ZipInputStream input = new ZipInputStream(
                 new BufferedInputStream(
                         new FileInputStream(inFile)))) {
