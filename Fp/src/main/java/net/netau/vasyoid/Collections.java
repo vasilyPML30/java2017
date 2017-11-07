@@ -54,6 +54,7 @@ public class Collections {
         }
         return result;
     }
+    
     public static <R, A> R foldr(@NotNull Function2<? super A, ? super R, ? extends R> function,
                                  R init, @NotNull Iterable<? extends A> arguments) {
         List<? extends A> list = map((x -> x), arguments);
