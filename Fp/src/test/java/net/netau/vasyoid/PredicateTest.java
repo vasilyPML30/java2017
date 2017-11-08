@@ -2,9 +2,11 @@ package net.netau.vasyoid;
 
 import static org.junit.Assert.*;
 import org.junit.Test;
-
 import java.util.Random;
 
+/**
+ * Tests for Predicate interface.
+ */
 public class PredicateTest {
 
     @Test

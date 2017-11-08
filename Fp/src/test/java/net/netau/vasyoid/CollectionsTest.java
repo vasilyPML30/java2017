@@ -1,11 +1,14 @@
 package net.netau.vasyoid;
 
 import static org.junit.Assert.*;
-import org.junit.Test;
 
+import org.junit.Test;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Tests for Collections class.
+ */
 public class CollectionsTest {
 
     @Test
@@ -38,7 +41,6 @@ public class CollectionsTest {
             if (i % 3 == 0) {
                 result.add(i);
             }
-
         }
         assertEquals(result, Collections.filter(f, list));
         assertEquals(list, Collections.filter(g, list));
@@ -62,7 +64,6 @@ public class CollectionsTest {
             if (i < 20) {
                 result.add(i);
             }
-
         }
         assertEquals(result, Collections.takeWhile(f, list));
         assertEquals(list, Collections.takeWhile(g, list));
@@ -86,7 +87,6 @@ public class CollectionsTest {
             if (i < 20) {
                 result.add(i);
             }
-
         }
         assertEquals(result, Collections.takeUnless(f, list));
         assertEquals(list, Collections.takeUnless(g, list));
@@ -120,6 +120,13 @@ public class CollectionsTest {
     }
 
     @Test
+    public void foldlEmptyTest() {
+        Function2<String, Integer, String> f = (x, y) -> x + String.valueOf(y);
+        List<Integer> list = new LinkedList<>();
+        assertEquals("str", Collections.foldl(f, "str", list));
+    }
+
+    @Test
     public void foldrIntegerTest() {
         Function2<Integer, Integer, Integer> f = (x, y) -> y - x;
         List<Integer> list = new LinkedList<>();
@@ -138,4 +145,12 @@ public class CollectionsTest {
         }
         assertEquals("0123456789: str", Collections.foldr(f, ": str", list));
     }
+
+    @Test
+    public void foldrEmptyTest() {
+        Function2<Integer, String, String> f = (x, y) -> String.valueOf(x) + y;
+        List<Integer> list = new LinkedList<>();
+        assertEquals("str", Collections.foldr(f, "str", list));
+    }
+
 }

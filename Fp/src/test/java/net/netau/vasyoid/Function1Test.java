@@ -4,6 +4,9 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 
+/**
+ * Tests for Function1 interface.
+ */
 public class Function1Test {
 
     @Test

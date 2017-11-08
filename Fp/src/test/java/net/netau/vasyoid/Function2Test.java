@@ -3,7 +3,9 @@ package net.netau.vasyoid;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
-
+/**
+ * Tests for Function2 interface.
+ */
 public class Function2Test {
 
     @Test
