@@ -45,7 +45,7 @@ public interface Predicate<A> extends Function1<A, Boolean> {
      * @return the predicate.
      */
     @NotNull
-    static Predicate ALWAYS_TRUE() {
+    static <A> Predicate<A> ALWAYS_TRUE() {
         return x -> true;
     }
 
@@ -54,7 +54,7 @@ public interface Predicate<A> extends Function1<A, Boolean> {
      * @return the predicate.
      */
     @NotNull
-    static Predicate ALWAYS_FALSE() {
+    static <A> Predicate<A> ALWAYS_FALSE() {
         return x -> false;
     }
 }

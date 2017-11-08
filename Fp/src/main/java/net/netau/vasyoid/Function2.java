@@ -53,6 +53,15 @@ public interface Function2<A, B, R> {
     }
 
     /**
+     * Converts the function into Function1.
+     * @return bind2 operator for the function.
+     */
+    @NotNull
+    default Function1<B, Function1<A, R>> curry() {
+        return this::bind2;
+    }
+
+    /**
      * Flips the order the arguments are substituted to the function.
      * @return the resulting function.
      */
@@ -61,12 +70,4 @@ public interface Function2<A, B, R> {
         return (firstArgument, secondArgument) -> apply(secondArgument, firstArgument);
     }
 
-    /**
-     * Converts the function into Function1.
-     * @return bind2 operator for the function.
-     */
-    @NotNull
-    default Function1<B, Function1<A, R>> curry() {
-        return this::bind2;
-    }
 }
