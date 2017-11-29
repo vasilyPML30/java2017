@@ -53,11 +53,7 @@ public class ExpressionEntity {
     }
 
     private void setValue(double value) throws UnsupportedOperationException {
-        if (type != EntityType.VALUE) {
-            throw new UnsupportedOperationException("this entity does not have a value");
-        } else {
-            this.value = value;
-        }
+        this.value = value;
     }
 
     /**
@@ -81,6 +77,19 @@ public class ExpressionEntity {
             return String.valueOf(getValue());
         }
         return type.toString();
+    }
+
+    /**
+     * Compares two entities.
+     * @param o entity ti compare.
+     * @return true if entities are equal, false otherwise
+     */
+    @Override
+    public boolean equals(Object o) {
+        return (o instanceof ExpressionEntity) &&
+               ((ExpressionEntity) o).getType() == getType() &&
+               (getType() != EntityType.VALUE ||
+                       ((ExpressionEntity) o).getValue() == getValue());
     }
 
     public enum EntityType {

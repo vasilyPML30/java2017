@@ -101,4 +101,17 @@ public class ExpressionEntityTest {
         assertEquals("/", new ExpressionEntity(DIV).toString());
     }
 
-}
+    @Test
+    public void equalsTest() {
+        assertEquals(new ExpressionEntity(2), new ExpressionEntity(2));
+        assertNotEquals(new ExpressionEntity(3), new ExpressionEntity(2));
+        assertEquals(new ExpressionEntity(LEFT_BRACKET),
+                new ExpressionEntity(LEFT_BRACKET));
+        assertNotEquals(new ExpressionEntity(LEFT_BRACKET),
+                new ExpressionEntity(RIGHT_BRACKET));
+        assertNotEquals(new ExpressionEntity(LEFT_BRACKET),
+                new ExpressionEntity(2));
+        assertNotEquals(new ExpressionEntity(2), 2.0);
+    }
+
+    }

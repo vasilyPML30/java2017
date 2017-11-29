@@ -22,7 +22,7 @@ public class PostfixNotationHelperTest {
         expression.add(new ExpressionEntity(DIV));
         expression.add(new ExpressionEntity(5));
         expression.add(new ExpressionEntity(MINUS));
-        assertEquals("1 2 + 3 & 4 / 5 -",
+        assertEquals("1.0 2.0 + 3.0 * 4.0 / 5.0 - ",
                 PostfixNotationHelper.expressionToString(expression));
     }
 

@@ -86,7 +86,7 @@ public class PostfixNotationHelper {
     @NotNull
     public static String expressionToString(@NotNull List<ExpressionEntity> expression) {
         return expression.stream()
-                .map(ExpressionEntity::toString)
+                .map(entity -> entity.toString() + " ")
                 .collect(Collectors.joining());
     }
 }
