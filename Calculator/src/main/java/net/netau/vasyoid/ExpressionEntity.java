@@ -15,6 +15,11 @@ public class ExpressionEntity {
         this.type = type;
     }
 
+    ExpressionEntity(double value) {
+        this(EntityType.VALUE);
+        setValue(value);
+    }
+
     @NotNull
     public EntityType getType() {
         return type;
@@ -22,7 +27,7 @@ public class ExpressionEntity {
 
     /**
      * Gets priority of an operator.
-     * This method is not supported by brackets and values.
+     * This method is not supported by right brackets and values.
      * @return the priority of the operator.
      * @throws UnsupportedOperationException if called not on an operator.
      */
@@ -47,13 +52,7 @@ public class ExpressionEntity {
         return type.apply(l, r);
     }
 
-    /**
-     * Sets the entity value.
-     * This method is supported only by entities of type VALUE.
-     * @param value value to set.
-     * @throws UnsupportedOperationException if called not for a VALUE.
-     */
-    public void setValue(double value) throws UnsupportedOperationException {
+    private void setValue(double value) throws UnsupportedOperationException {
         if (type != EntityType.VALUE) {
             throw new UnsupportedOperationException("this entity does not have a value");
         } else {

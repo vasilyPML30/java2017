@@ -6,14 +6,16 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import static net.netau.vasyoid.ExpressionEntity.EntityType.*;
 
 /**
- * This class is used to convert an expression in infix notation represented by a String
+ * This class is used to infixToPostfix an expression in infix notation represented by a String
  * into an expression in postfix notation represented by a list of ExpressionEntry-s.
  */
-public class ToPostfixConverter {
+public class PostfixNotationHelper {
 
     private static void addOperator(@NotNull ExpressionEntity operator,
                              @NotNull MyStack<ExpressionEntity> stack,
@@ -26,11 +28,11 @@ public class ToPostfixConverter {
 
     /**
      * Converts an expression into postfix notation.
-     * @param expression expression to convert.
+     * @param expression expression to infixToPostfix.
      * @return resulting expression.
      * @throws InvalidParameterException if given expression is incorrect.
      */
-    public static List<ExpressionEntity> convert(String expression)
+    public static List<ExpressionEntity> infixToPostfix(String expression)
             throws InvalidParameterException {
         List<ExpressionEntity> result = new ArrayList<>();
         MyStack<ExpressionEntity> stack = new MyStack<>();
@@ -65,19 +67,26 @@ public class ToPostfixConverter {
                         addOperator(new ExpressionEntity(DIV), stack, result);
                         break;
                     default:
-                        ExpressionEntity value = new ExpressionEntity(VALUE);
-                        value.setValue(Double.parseDouble(curToken));
-                        result.add(value);
+                        result.add(new ExpressionEntity(Double.parseDouble(curToken)));
                         break;
                 }
-            }
-            if (!stack.isEmpty()) {
-                throw new Exception();
             }
         }
         catch (Exception e) {
             throw new InvalidParameterException("Expression format is invalid");
         }
         return result;
+    }
+
+    /**
+     * Takes a list containing an expression in postfix notation and converts it into String.
+     * @param expression expression to print.
+     * @return resulting string.
+     */
+    @NotNull
+    public static String expressionToString(@NotNull List<ExpressionEntity> expression) {
+        return expression.stream()
+                .map(ExpressionEntity::toString)
+                .collect(Collectors.joining());
     }
 }
