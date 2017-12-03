@@ -2,14 +2,11 @@
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 # User-specific stuff:
-.idea
+.idea/
 workspace.xml
 
 # Sensitive or high-churn files:
 uiDesigner.xml
-
-# Gradle:
-.gradle
 
 # CMake
 cmake-build-debug/
