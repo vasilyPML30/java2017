@@ -40,15 +40,15 @@ public final class SecondPartTasks {
      */
     public static double piDividedBy4() {
         return Stream.generate(() -> {
-                    Point2D.Double point = new Point2D.Double();
-                    Random random = new Random();
-                    point.setLocation(random.nextDouble() - 0.5, random.nextDouble() - 0.5);
-                    return point;
-                })
-                .limit(SHOTS_COUNT)
-                .map(point -> Math.sqrt(point.getX() * point.getX() + point.getY() * point.getY()))
-                .mapToInt(x -> (x <= 0.5 ? 1 : 0))
-                .average().orElse(0);
+                Point2D.Double point = new Point2D.Double();
+                Random random = new Random();
+                point.setLocation(random.nextDouble() - 0.5, random.nextDouble() - 0.5);
+                return point;
+            })
+            .limit(SHOTS_COUNT)
+            .map(point -> Math.sqrt(point.getX() * point.getX() + point.getY() * point.getY()))
+            .mapToInt(x -> (x <= 0.5 ? 1 : 0))
+            .average().orElse(0);
     }
 
     /** Дано отображение из имени автора в список с содержанием его произведений.
@@ -57,19 +57,19 @@ public final class SecondPartTasks {
     public static String findPrinter(Map<String, List<String>> compositions)
                                                         throws IllegalArgumentException{
         return compositions.entrySet().stream()
-                .collect(
-                        Collectors.groupingBy(
-                                Map.Entry::getKey,
-                                Collectors.summingInt(
-                                        entry -> entry.getValue().stream()
-                                                .mapToInt(String::length).sum()
-                                )
-                        )
-                )
-                .entrySet().stream()
-                .max(Comparator.comparingInt(Map.Entry::getValue))
-                .orElseThrow(() -> new IllegalArgumentException("Empty compositions list"))
-                .getKey();
+            .collect(
+                    Collectors.groupingBy(
+                            Map.Entry::getKey,
+                            Collectors.summingInt(
+                                    entry -> entry.getValue().stream()
+                                            .mapToInt(String::length).sum()
+                            )
+                    )
+            )
+            .entrySet().stream()
+            .max(Comparator.comparingInt(Map.Entry::getValue))
+            .orElseThrow(() -> new IllegalArgumentException("Empty compositions list"))
+            .getKey();
     }
 
     /** Вы крупный поставщик продуктов. Каждая торговая сеть делает вам заказ в виде Map<Товар, Количество>.
@@ -77,11 +77,11 @@ public final class SecondPartTasks {
      */
     public static Map<String, Integer> calculateGlobalOrder(List<Map<String, Integer>> orders) {
         return orders.stream().flatMap(order -> order.entrySet().stream())
-                .collect(
-                        Collectors.groupingBy(
-                                Map.Entry::getKey,
-                                Collectors.summingInt(Map.Entry::getValue)
-                        )
-                );
+            .collect(
+                    Collectors.groupingBy(
+                            Map.Entry::getKey,
+                            Collectors.summingInt(Map.Entry::getValue)
+                    )
+            );
     }
 }
