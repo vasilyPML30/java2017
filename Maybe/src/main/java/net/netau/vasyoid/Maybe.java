@@ -15,6 +15,7 @@ import java.util.function.Function;
 public class Maybe<T> {
     private T value;
     private boolean isPresent;
+    private static final Maybe NOTHING = new Maybe<>(null);
 
     private Maybe(@Nullable T value) {
         this.value = value;
@@ -37,7 +38,7 @@ public class Maybe<T> {
      * @return container without an element.
      */
     public static @NotNull <T> Maybe<T> nothing() {
-        return new Maybe<>(null);
+        return NOTHING;
     }
 
     /**
@@ -72,36 +73,6 @@ public class Maybe<T> {
             return nothing();
         }
         return new Maybe<>(mapper.apply(value));
-    }
-
-    /**
-     * Reads double number from input stream.
-     * @param input where to read from.
-     * @return Just number if read successfully, nothing otherwise.
-     * @throws IOException if any problems with reading happen.
-     */
-    public static @NotNull Maybe<Double> readDouble(@NotNull Scanner input) throws IOException {
-        String line = input.nextLine();
-        try {
-            return just(Double.parseDouble(line));
-        } catch (NumberFormatException e) {
-            return nothing();
-        }
-    }
-
-    /**
-     * Writes double number to output stream (or "null" if number == nothing)
-     * @param number Maybe container with number to write.
-     * @param output where to write.
-     * @throws IOException if any problems with writing happen.
-     */
-    public static void writeDouble(@NotNull Maybe<Double> number,
-                                   @NotNull PrintWriter output) throws IOException {
-        try {
-            output.println(String.valueOf(number.get()));
-        } catch (GetFromNothingException e) {
-            output.println("null");
-        }
     }
 
 }

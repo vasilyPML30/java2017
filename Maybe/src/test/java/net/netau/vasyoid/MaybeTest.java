@@ -82,9 +82,9 @@ public class MaybeTest {
         PrintWriter output = new PrintWriter(stringWriter);
         ArrayList<Maybe<Double>> actual = new ArrayList<>();
         while (input.hasNext()) {
-            Maybe<Double> num = Maybe.readDouble(input);
+            Maybe<Double> num = Main.readDouble(input);
             actual.add(num);
-            Maybe.writeDouble(num, output);
+            Main.writeDouble(num, output);
         }
         assertEquals(new Double(1.2), actual.get(0).get());
         assertEquals(new Double(-0.5), actual.get(1).get());
