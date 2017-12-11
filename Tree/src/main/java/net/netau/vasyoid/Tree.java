@@ -72,7 +72,7 @@ public class Tree<Type extends Comparable<Type>> {
         MyNode parent = lowerBound(value, root);
         if (parent == null) {
             addRightmost(value, root);
-        } else if (parent.left != null){
+        } else if (parent.left != null) {
             addRightmost(value, parent.left);
         } else {
             parent.left = new MyNode(value);
