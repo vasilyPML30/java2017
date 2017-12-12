@@ -37,6 +37,7 @@ public class Maybe<T> {
      * @param <T> expected type.
      * @return container without an element.
      */
+    @SuppressWarnings("unchecked")
     public static @NotNull <T> Maybe<T> nothing() {
         return NOTHING;
     }
