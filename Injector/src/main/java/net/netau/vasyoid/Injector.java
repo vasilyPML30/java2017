@@ -16,14 +16,15 @@ public class Injector {
     private static Object getInstance(@NotNull Class classToInstantiate,
                                       @NotNull HashMap instances)
                                         throws ImplementationNotFoundException {
-        if (instances.containsKey(classToInstantiate)) {
+        if (instances.containsKey(classToInstantiate) &&
+                instances.get(classToInstantiate) != null) {
             return instances.get(classToInstantiate);
         }
         Constructor constructor = classToInstantiate.getConstructors()[0];
         Object[] parameters = Arrays.stream(constructor.getParameterTypes())
                 .map((Function<Class, Object>) instances::get).toArray();
         try {
-            return classToInstantiate.getConstructors()[0].newInstance(parameters);
+            return constructor.newInstance(parameters);
         } catch (Exception e) {
             throw new ImplementationNotFoundException();
         }
@@ -55,16 +56,16 @@ public class Injector {
         return result;
     }
 
-    private static void initializeCondidates(@NotNull List<Class<?>> condidates,
+    private static void initializeCandidates(@NotNull List<Class<?>> candidates,
                                              @NotNull Iterable<Class<?>> implementations,
                                              @NotNull HashMap<Class, Object> instances)
                                                                         throws Exception {
-        if (condidates.isEmpty()) {
+        if (candidates.isEmpty()) {
             throw new ImplementationNotFoundException();
-        } else if (condidates.size() > 1) {
+        } else if (candidates.size() > 1) {
             throw new AmbigiousImplementationException();
         } else {
-            initializeRecursively(condidates.get(0), implementations, instances);
+            initializeRecursively(candidates.get(0), implementations, instances);
         }
     }
 
@@ -86,13 +87,13 @@ public class Injector {
             if (!instances.containsKey(parameterType)) {
                 for (Class<?> implementation : implementations) {
                     if (parameterType.isInterface()) {
-                        List<Class<?>> condidates = getInterfaceImplementations(parameterType,
+                        List<Class<?>> candidates = getInterfaceImplementations(parameterType,
                                                                       implementations);
-                        initializeCondidates(condidates, implementations, instances);
+                        initializeCandidates(candidates, implementations, instances);
                     } else if (Modifier.isAbstract(parameterType.getModifiers())) {
-                        List<Class<?>> condidates = getAbstractImplementations(parameterType,
+                        List<Class<?>> candidates = getAbstractImplementations(parameterType,
                                                                      implementations);
-                        initializeCondidates(condidates, implementations, instances);
+                        initializeCandidates(candidates, implementations, instances);
                     } else {
                         initializeRecursively(implementation, implementations, instances);
                     }
