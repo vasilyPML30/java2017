@@ -1,40 +1,110 @@
 package net.netau.vasyoid;
 
-import java.io.IOException;
-import java.io.Serializable;
-
-public class SomeClass implements Serializable {
+public class SomeClass<T, S, F> extends java.util.AbstractSet<S> implements java.util.function.Predicate<F> {
 
     public int asd;
-    public Integer bsd;
-    private SomeClass dfsdfs;
-    protected static Object SDF_SF;
 
-    public static void main(int argc, String[] argv, Object obj) throws IOException {
+    public T t;
 
-    }
+    public java.lang.Integer bsd;
 
-    private static String foo() {
-        return "asd";
-    }
+    private java.lang.String dfsdfs;
 
-    protected static Boolean bar() {
-        return true;
-    }
+    protected static java.lang.Object SDF_SF;
 
-    protected static boolean baz() {
-        return true;
+    public SomeClass() {
     }
 
     protected static double asd() {
-        return -42;
+        return 0;
     }
 
-    private interface IMyInterface {}
-    private abstract class MyAbstractClass {}
-    private final class MyFinalClass implements IMyInterface {}
-    class MyPackagePrivateClass extends MyAbstractClass {}
-    public static class MyPublicClass {
-        public class MyNestedPublicClass {}
+    private static <R> java.lang.String foo(R arg1) {
+        return null;
     }
+
+    private static <R, P, E> P foo2(R arg1) {
+        return null;
+    }
+
+    protected static java.lang.Boolean bar() {
+        return null;
+    }
+
+    protected static boolean baz() {
+        return false;
+    }
+
+    public OneMoreClass<? extends T> oneMoreMethod(OneMoreClass<? super T> arg1) {
+        return null;
+    }
+
+    public static void main(int arg1, java.lang.String[] arg2, java.lang.Object arg3) throws java.io.IOException {
+
+    }
+
+    public int size() {
+        return 0;
+    }
+
+    public java.util.Iterator<S> iterator() {
+        return null;
+    }
+
+    public boolean test(F arg1) {
+        return false;
+    }
+
+    public class OneMoreClass<A> {
+
+        public OneMoreClass() {
+        }
+
+    }
+
+    public static class MyPublicClass {
+
+        public MyPublicClass() {
+        }
+
+        public class MyNestedPublicClass {
+
+            public MyNestedPublicClass() {
+            }
+
+        }
+
+    }
+
+    class MyPackagePrivateClass extends MyAbstractClass {
+
+        MyPackagePrivateClass() {
+        }
+
+    }
+
+    private final class MyFinalClass implements IMyInterface {
+
+        <ASD> MyFinalClass(ASD arg1) {
+        }
+
+        MyFinalClass() {
+        }
+
+        MyFinalClass(SomeClass arg1) {
+        }
+
+    }
+
+    private abstract class MyAbstractClass {
+
+        private MyAbstractClass() {
+        }
+
+    }
+
+    private abstract static interface IMyInterface {
+
+    }
+
 }

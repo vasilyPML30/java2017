@@ -10,6 +10,14 @@ import java.util.stream.Collectors;
 
 public class Reflector {
 
+    private static String getShortTypeName(Package currentPackage, Type type) {
+        String result = type.getTypeName();
+        if (!result.startsWith(currentPackage.getName())) {
+            return result;
+        }
+        return result.replaceAll(".*(\\$|\\.)", "");
+    }
+
     private static void printFields(String indent,
                                     Class<?> someClass,
                                     PrintWriter out) throws IOException {
@@ -20,29 +28,31 @@ public class Reflector {
                 if (!modifiers.equals("")) {
                     out.print(modifiers + " ");
                 }
-                out.print(field.getType().getSimpleName());
+                out.print(getShortTypeName(someClass.getPackage(), field.getGenericType()));
                 out.println(" " + field.getName() + ";");
                 out.println();
             }
         }
     }
 
-    private static void printExceptions(Class<?>[] exceptions,
-                                       PrintWriter out) throws IOException {
+    private static void printExceptions(Package currentPackage,
+                                        Type[] exceptions,
+                                        PrintWriter out) throws IOException {
         if (exceptions.length > 0) {
             out.print(" throws");
             out.print(Arrays.stream(exceptions)
-                    .map(Class::getSimpleName)
+                    .map(t -> getShortTypeName(currentPackage, t))
                     .collect(Collectors.joining(", ", " ", "")));
         }
     }
 
-    private static void printArguments(Class<?>[] arguments,
+    private static void printArguments(Package currentPackage,
+                                       Type[] arguments,
                                        PrintWriter out) throws IOException {
+
         out.print(Arrays.stream(arguments)
                 .filter(Objects::nonNull)
-                .filter(c -> !c.isSynthetic())
-                .map(Class::getSimpleName)
+                .map(t -> getShortTypeName(currentPackage, t))
                 .map(new Function<String, String>() {
                     private int count = 1;
                     @Override
@@ -61,42 +71,52 @@ public class Reflector {
         if (!modifiers.equals("")) {
             out.print(modifiers + " ");
         }
-        out.print(someMethod.getReturnType().getSimpleName());
-        out.print(" " + someMethod.getName());
+        printTypeParameters(someMethod.getDeclaringClass().getPackage(), someMethod.getTypeParameters(), out);
+        if (someMethod.getTypeParameters().length > 0) {
+            out.print(" ");
+        }
+        out.print(getShortTypeName(someMethod.getDeclaringClass().getPackage(), someMethod.getGenericReturnType()) + " ");
+        out.print(someMethod.getName());
         out.print("(");
-        printArguments(someMethod.getParameterTypes(), out);
+
+
+        printArguments(someMethod.getDeclaringClass().getPackage(), someMethod.getGenericParameterTypes(), out);
         out.print(")");
-        printExceptions(someMethod.getExceptionTypes(), out);
+        printExceptions(someMethod.getDeclaringClass().getPackage(), someMethod.getGenericExceptionTypes(), out);
         out.println(" {");
     }
 
     private static void printConstructorHeader(String indent,
                                           Constructor someConstructor,
-                                          boolean isClassInner,
+                                          Class<?> outerClass,
                                           PrintWriter out) throws IOException {
         out.print(indent);
         String modifiers = Modifier.toString(someConstructor.getModifiers());
         if (!modifiers.equals("")) {
             out.print(modifiers + " ");
         }
+        printTypeParameters(someConstructor.getDeclaringClass().getPackage(), someConstructor.getTypeParameters(), out);
+        if (someConstructor.getTypeParameters().length > 0) {
+            out.print(" ");
+        }
         out.print(someConstructor.getDeclaringClass().getSimpleName());
         out.print("(");
-        Class<?>[] arguments = someConstructor.getParameterTypes();
-        if (isClassInner) {
+        Type[] arguments = someConstructor.getGenericParameterTypes();
+        if (arguments.length > 0 && arguments[0].getTypeName().equals(outerClass.getTypeName())) {
             arguments[0] = null;
         }
-        printArguments(arguments, out);
+        printArguments(someConstructor.getDeclaringClass().getPackage(), arguments, out);
         out.print(")");
-        printExceptions(someConstructor.getExceptionTypes(), out);
+        printExceptions(someConstructor.getDeclaringClass().getPackage(), someConstructor.getExceptionTypes(), out);
         out.println(" {");
     }
 
     private static void printConstructors(String indent,
-                                     Class<?> someClass, boolean isClassInner,
+                                     Class<?> someClass, Class<?> outerClass,
                                      PrintWriter out) throws IOException {
         for (Constructor constructor : someClass.getDeclaredConstructors()) {
             if (!constructor.isSynthetic()) {
-                printConstructorHeader(indent, constructor, isClassInner, out);
+                printConstructorHeader(indent, constructor, outerClass, out);
                 out.println(indent + "}");
                 out.println();
             }
@@ -133,7 +153,17 @@ public class Reflector {
                                             Class<?> someClass,
                                             PrintWriter out) throws IOException {
         for (Class<?> clazz : someClass.getDeclaredClasses()) {
-            printClass(indent, clazz, !Modifier.isStatic(clazz.getModifiers()), out);
+            printClass(indent, clazz, Modifier.isStatic(clazz.getModifiers()) ? null : someClass, out);
+        }
+    }
+
+    private static void printTypeParameters(Package currentPackage,
+                                            Type[] types,
+                                            PrintWriter out) throws IOException {
+        if (types.length > 0) {
+            out.print(Arrays.stream(types)
+                    .map(t -> getShortTypeName(currentPackage, t))
+                    .collect(Collectors.joining(", ", "<", ">")));
         }
     }
 
@@ -145,18 +175,21 @@ public class Reflector {
         if (!modifiers.equals("")) {
             out.print(modifiers + " ");
         }
-        out.print(someClass.isInterface() ? "interface" : "class");
-        out.print(" " + someClass.getSimpleName());
+        if (!someClass.isInterface()) {
+            out.print("class ");
+        }
+        out.print(someClass.getSimpleName());
+        printTypeParameters(someClass.getPackage(), someClass.getTypeParameters(), out);
         Class<?> superclass = someClass.getSuperclass();
         if (superclass != Object.class && superclass != null) {
             out.print(" extends");
-            out.print(" " + superclass.getSimpleName());
+            out.print(" " + getShortTypeName(someClass.getPackage(), someClass.getGenericSuperclass()));
         }
-        Class<?>[] interfaces = someClass.getInterfaces();
+        Type[] interfaces = someClass.getGenericInterfaces();
         if (interfaces.length > 0) {
             out.print(" implements");
             out.print(Arrays.stream(interfaces)
-                    .map(Class::getSimpleName)
+                    .map(t -> getShortTypeName(someClass.getPackage(), t))
                     .collect(Collectors.joining(", ", " ", "")));
         }
         out.println(" {");
@@ -165,12 +198,12 @@ public class Reflector {
 
     private static void printClass(String indent,
                                    Class<?> someClass,
-                                   boolean isInner,
+                                   Class<?> outerClass,
                                    PrintWriter out) throws IOException {
         if (!someClass.isSynthetic()) {
             printClassHeader(indent, someClass, out);
             printFields(indent + "    ", someClass, out);
-            printConstructors(indent + "    ", someClass, isInner, out);
+            printConstructors(indent + "    ", someClass, outerClass, out);
             printMethods(indent + "    ", someClass, out);
             printInnerAndNestedClasses(indent + "    ", someClass, out);
             out.println(indent + "}");
@@ -180,7 +213,7 @@ public class Reflector {
 
     public static void printStructure(Class<?> someClass) {
         try (PrintWriter out = new PrintWriter(someClass.getSimpleName() + ".java")) {
-            printClass("", someClass, false, out);
+            printClass("", someClass, null, out);
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
