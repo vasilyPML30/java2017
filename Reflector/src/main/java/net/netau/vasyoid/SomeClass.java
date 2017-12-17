@@ -25,13 +25,16 @@ public class SomeClass implements Serializable {
     protected static boolean baz() {
         return true;
     }
+
     protected static double asd() {
         return -42;
     }
 
     private interface IMyInterface {}
-    private static abstract class MyAbstractClass {}
-    private static final class MyFinalClass implements IMyInterface {}
-    static class MyPackagePrivateClass extends MyAbstractClass {}
-    public static class MyPublicClass {}
+    private abstract class MyAbstractClass {}
+    private final class MyFinalClass implements IMyInterface {}
+    class MyPackagePrivateClass extends MyAbstractClass {}
+    public static class MyPublicClass {
+        public class MyNestedPublicClass {}
+    }
 }
