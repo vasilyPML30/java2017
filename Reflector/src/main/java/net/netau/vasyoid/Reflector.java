@@ -1,5 +1,8 @@
 package net.netau.vasyoid;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.*;
@@ -11,7 +14,9 @@ import java.util.stream.Collectors;
 
 public class Reflector {
 
-    private static String getShortTypeName(Package currentPackage, Type type) {
+    @NotNull
+    private static String getShortTypeName(@NotNull Package currentPackage,
+                                           @NotNull Type type) {
         String result = type.getTypeName();
         if (!result.startsWith(currentPackage.getName())) {
             return result;
@@ -19,9 +24,9 @@ public class Reflector {
         return result.replaceAll(".*([$.])", "");
     }
 
-    private static void printFields(String indent,
-                                    Class<?> someClass,
-                                    PrintWriter out) throws IOException {
+    private static void printFields(@NotNull String indent,
+                                    @NotNull Class<?> someClass,
+                                    @NotNull PrintWriter out) throws IOException {
         for (Field field : someClass.getDeclaredFields()) {
             if (!field.isSynthetic()) {
                 out.print(indent);
@@ -36,9 +41,9 @@ public class Reflector {
         }
     }
 
-    private static void printExceptions(Package currentPackage,
-                                        Type[] exceptions,
-                                        PrintWriter out) throws IOException {
+    private static void printExceptions(@NotNull Package currentPackage,
+                                        @NotNull Type[] exceptions,
+                                        @NotNull PrintWriter out) throws IOException {
         if (exceptions.length > 0) {
             out.print(" throws");
             out.print(Arrays.stream(exceptions)
@@ -47,9 +52,9 @@ public class Reflector {
         }
     }
 
-    private static void printArguments(Package currentPackage,
+    private static void printArguments(@NotNull Package currentPackage,
                                        Type[] arguments,
-                                       PrintWriter out) throws IOException {
+                                       @NotNull PrintWriter out) throws IOException {
 
         out.print(Arrays.stream(arguments)
                 .filter(Objects::nonNull)
@@ -64,9 +69,9 @@ public class Reflector {
                 .collect(Collectors.joining(", ")));
     }
 
-    private static void printMethodHeader(String indent,
-                                         Method someMethod,
-                                         PrintWriter out) throws IOException {
+    private static void printMethodHeader(@NotNull String indent,
+                                          @NotNull Method someMethod,
+                                          @NotNull PrintWriter out) throws IOException {
         out.print(indent);
         String modifiers = Modifier.toString(someMethod.getModifiers());
         if (!modifiers.equals("")) {
@@ -87,10 +92,10 @@ public class Reflector {
         out.println(" {");
     }
 
-    private static void printConstructorHeader(String indent,
-                                          Constructor someConstructor,
-                                          Class<?> outerClass,
-                                          PrintWriter out) throws IOException {
+    private static void printConstructorHeader(@NotNull String indent,
+                                               @NotNull Constructor someConstructor,
+                                               @Nullable Class<?> outerClass,
+                                               @NotNull PrintWriter out) throws IOException {
         out.print(indent);
         String modifiers = Modifier.toString(someConstructor.getModifiers());
         if (!modifiers.equals("")) {
@@ -103,7 +108,7 @@ public class Reflector {
         out.print(someConstructor.getDeclaringClass().getSimpleName());
         out.print("(");
         Type[] arguments = someConstructor.getGenericParameterTypes();
-        if (arguments.length > 0 && arguments[0].getTypeName().equals(outerClass.getTypeName())) {
+        if (arguments.length > 0 && outerClass != null && arguments[0].getTypeName().equals(outerClass.getTypeName())) {
             arguments[0] = null;
         }
         printArguments(someConstructor.getDeclaringClass().getPackage(), arguments, out);
@@ -112,9 +117,10 @@ public class Reflector {
         out.println(" {");
     }
 
-    private static void printConstructors(String indent,
-                                     Class<?> someClass, Class<?> outerClass,
-                                     PrintWriter out) throws IOException {
+    private static void printConstructors(@NotNull String indent,
+                                          @NotNull Class<?> someClass,
+                                          @Nullable Class<?> outerClass,
+                                          @NotNull PrintWriter out) throws IOException {
         for (Constructor constructor : someClass.getDeclaredConstructors()) {
             if (!constructor.isSynthetic()) {
                 printConstructorHeader(indent, constructor, outerClass, out);
@@ -124,9 +130,9 @@ public class Reflector {
         }
     }
 
-    private static void printMethods(String indent,
-                                    Class<?> someClass,
-                                    PrintWriter out) throws IOException {
+    private static void printMethods(@NotNull String indent,
+                                     @NotNull Class<?> someClass,
+                                     @NotNull PrintWriter out) throws IOException {
         for (Method method : someClass.getDeclaredMethods()) {
             if (!method.isSynthetic()) {
                 printMethodHeader(indent, method, out);
@@ -150,17 +156,17 @@ public class Reflector {
     }
 
 
-    private static void printInnerAndNestedClasses(String indent,
-                                            Class<?> someClass,
-                                            PrintWriter out) throws IOException {
+    private static void printInnerAndNestedClasses(@NotNull String indent,
+                                                   @NotNull Class<?> someClass,
+                                                   @NotNull PrintWriter out) throws IOException {
         for (Class<?> clazz : someClass.getDeclaredClasses()) {
             printClass(indent, clazz, Modifier.isStatic(clazz.getModifiers()) ? null : someClass, out);
         }
     }
 
-    private static void printTypeParameters(Package currentPackage,
-                                            TypeVariable[] types,
-                                            PrintWriter out) throws IOException {
+    private static void printTypeParameters(@NotNull Package currentPackage,
+                                            @NotNull TypeVariable[] types,
+                                            @NotNull PrintWriter out) throws IOException {
         if (types.length > 0) {
             out.print(Arrays.stream(types)
                     .map(t -> {
@@ -178,9 +184,9 @@ public class Reflector {
         }
     }
 
-    private static void printClassHeader(String indent,
-                                         Class<?> someClass,
-                                         PrintWriter out) throws IOException {
+    private static void printClassHeader(@NotNull String indent,
+                                         @NotNull Class<?> someClass,
+                                         @NotNull PrintWriter out) throws IOException {
         out.print(indent);
         String modifiers = Modifier.toString(someClass.getModifiers());
         if (!modifiers.equals("")) {
@@ -207,10 +213,10 @@ public class Reflector {
         out.println();
     }
 
-    private static void printClass(String indent,
-                                   Class<?> someClass,
-                                   Class<?> outerClass,
-                                   PrintWriter out) throws IOException {
+    private static void printClass(@NotNull String indent,
+                                   @NotNull Class<?> someClass,
+                                   @Nullable Class<?> outerClass,
+                                   @NotNull PrintWriter out) throws IOException {
         if (!someClass.isSynthetic()) {
             printClassHeader(indent, someClass, out);
             printFields(indent + "    ", someClass, out);
@@ -222,7 +228,7 @@ public class Reflector {
         }
     }
 
-    public static void printStructure(Class<?> someClass) {
+    public static void printStructure(@NotNull Class<?> someClass) {
         try (PrintWriter out = new PrintWriter(someClass.getSimpleName() + ".java")) {
             out.println("package " + someClass.getPackage().getName() + ";\n");
             printClass("", someClass, null, out);

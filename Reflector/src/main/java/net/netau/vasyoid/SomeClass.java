@@ -15,6 +15,9 @@ public class SomeClass<T, S, F> extends java.util.AbstractSet<S> implements java
     public SomeClass() {
     }
 
+    public SomeClass(SomeClass other) {
+    }
+
     protected static <E extends java.lang.Throwable> double asd() throws E {
         return 0;
     }
