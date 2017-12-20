@@ -74,9 +74,7 @@ public class SmartList<E> extends AbstractList<E> implements List<E> {
     @Override
     @Nullable
     public E get(int index) {
-        if (listSize == 0 || index < 0 || index >= listSize) {
-            throw new IndexOutOfBoundsException();
-        }
+        checkIndex(index, true);
         E result;
         if (listSize <= 1) {
             result = (E) data;
@@ -112,6 +110,41 @@ public class SmartList<E> extends AbstractList<E> implements List<E> {
         }
         listSize++;
         return true;
+    }
+
+    private void checkIndex(int index, boolean checkSize) {
+        if ((checkSize && listSize == 0)
+                || index < 0 || index >= listSize) {
+            throw new IndexOutOfBoundsException();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void add(int index, @Nullable E element) {
+        checkIndex(index, false);
+        if (listSize == 0) {
+            data = element;
+        } else if (listSize == 1) {
+            if (index == 0) {
+                data = new Object[]{data, element, null, null, null};
+            } else {
+                data = new Object[]{element, data, null, null, null};
+            }
+        } else if (listSize < SMALL_SIZE) {
+            for (int i = listSize - 1; i > index; i--) {
+                ((E[])data)[i] = ((E[])data)[i - 1];
+            }
+            ((E[])data)[index] = element;
+        } else if (listSize == SMALL_SIZE) {
+            List newData = new ArrayList();
+            newData.addAll(Arrays.asList((E[]) data));
+            newData.add(index, element);
+            data = newData;
+        } else {
+            ((ArrayList) data).add(index, element);
+        }
+        listSize++;
     }
 
     /**
