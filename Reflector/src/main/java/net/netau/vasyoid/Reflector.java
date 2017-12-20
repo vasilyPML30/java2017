@@ -5,8 +5,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -25,39 +29,46 @@ public class Reflector {
         return result.replaceAll(".*([$.])", "");
     }
 
-    private static void printFields(@NotNull String indent,
-                                    @NotNull Class<?> someClass,
-                                    @NotNull PrintWriter out) throws IOException {
+    private static void printField(@NotNull String indent,
+                                   @NotNull Field someField,
+                                   @NotNull Writer out) throws IOException {
+        out.write(indent);
+        String modifiers = Modifier.toString(someField.getModifiers());
+        if (!modifiers.equals("")) {
+            out.write(modifiers + " ");
+        }
+        out.write(getShortTypeName(someField.getDeclaringClass().getPackage(),
+                someField.getGenericType()));
+        out.write(" " + someField.getName() + ";\n\n");
+
+    }
+
+        private static void printFields(@NotNull String indent,
+                                        @NotNull Class<?> someClass,
+                                        @NotNull Writer out) throws IOException {
         for (Field field : someClass.getDeclaredFields()) {
             if (!field.isSynthetic()) {
-                out.print(indent);
-                String modifiers = Modifier.toString(field.getModifiers());
-                if (!modifiers.equals("")) {
-                    out.print(modifiers + " ");
-                }
-                out.print(getShortTypeName(someClass.getPackage(), field.getGenericType()));
-                out.println(" " + field.getName() + ";");
-                out.println();
+                printField(indent, field, out);
             }
         }
     }
 
     private static void printExceptions(@NotNull Package currentPackage,
                                         @NotNull Type[] exceptions,
-                                        @NotNull PrintWriter out) throws IOException {
+                                        @NotNull Writer out) throws IOException {
         if (exceptions.length > 0) {
-            out.print(" throws");
-            out.print(Arrays.stream(exceptions)
+            out.write(" throws");
+            out.write(Arrays.stream(exceptions)
                     .map(t -> getShortTypeName(currentPackage, t))
                     .collect(Collectors.joining(", ", " ", "")));
         }
     }
 
     private static void printArguments(@NotNull Package currentPackage,
-                                       Type[] arguments,
-                                       @NotNull PrintWriter out) throws IOException {
+                                       @Nullable Type @NotNull [] arguments,
+                                       @NotNull Writer out) throws IOException {
 
-        out.print(Arrays.stream(arguments)
+        out.write(Arrays.stream(arguments)
                 .filter(Objects::nonNull)
                 .map(t -> getShortTypeName(currentPackage, t))
                 .map(new Function<String, String>() {
@@ -72,86 +83,84 @@ public class Reflector {
 
     private static void printMethodHeader(@NotNull String indent,
                                           @NotNull Method someMethod,
-                                          @NotNull PrintWriter out) throws IOException {
-        out.print(indent);
+                                          @NotNull Writer out) throws IOException {
+        out.write(indent);
         String modifiers = Modifier.toString(someMethod.getModifiers());
         if (!modifiers.equals("")) {
-            out.print(modifiers + " ");
+            out.write(modifiers + " ");
         }
         printTypeParameters(someMethod.getDeclaringClass().getPackage(), someMethod.getTypeParameters(), out);
         if (someMethod.getTypeParameters().length > 0) {
-            out.print(" ");
+            out.write(" ");
         }
-        out.print(getShortTypeName(someMethod.getDeclaringClass().getPackage(), someMethod.getGenericReturnType()) + " ");
-        out.print(someMethod.getName());
-        out.print("(");
+        out.write(getShortTypeName(someMethod.getDeclaringClass().getPackage(), someMethod.getGenericReturnType()) + " ");
+        out.write(someMethod.getName());
+        out.write("(");
 
 
         printArguments(someMethod.getDeclaringClass().getPackage(), someMethod.getGenericParameterTypes(), out);
-        out.print(")");
+        out.write(")");
         printExceptions(someMethod.getDeclaringClass().getPackage(), someMethod.getGenericExceptionTypes(), out);
-        out.println(" {");
     }
 
     private static void printConstructorHeader(@NotNull String indent,
                                                @NotNull Constructor someConstructor,
                                                @Nullable Class<?> outerClass,
-                                               @NotNull PrintWriter out) throws IOException {
-        out.print(indent);
+                                               @NotNull Writer out) throws IOException {
+        out.write(indent);
         String modifiers = Modifier.toString(someConstructor.getModifiers());
         if (!modifiers.equals("")) {
-            out.print(modifiers + " ");
+            out.write(modifiers + " ");
         }
         printTypeParameters(someConstructor.getDeclaringClass().getPackage(), someConstructor.getTypeParameters(), out);
         if (someConstructor.getTypeParameters().length > 0) {
-            out.print(" ");
+            out.write(" ");
         }
-        out.print(someConstructor.getDeclaringClass().getSimpleName());
-        out.print("(");
+        out.write(someConstructor.getDeclaringClass().getSimpleName());
+        out.write("(");
         Type[] arguments = someConstructor.getGenericParameterTypes();
         if (arguments.length > 0 && outerClass != null && arguments[0].getTypeName().equals(outerClass.getTypeName())) {
             arguments[0] = null;
         }
         printArguments(someConstructor.getDeclaringClass().getPackage(), arguments, out);
-        out.print(")");
+        out.write(")");
         printExceptions(someConstructor.getDeclaringClass().getPackage(), someConstructor.getExceptionTypes(), out);
-        out.println(" {");
     }
 
     private static void printConstructors(@NotNull String indent,
                                           @NotNull Class<?> someClass,
                                           @Nullable Class<?> outerClass,
-                                          @NotNull PrintWriter out) throws IOException {
+                                          @NotNull Writer out) throws IOException {
         for (Constructor constructor : someClass.getDeclaredConstructors()) {
             if (!constructor.isSynthetic()) {
                 printConstructorHeader(indent, constructor, outerClass, out);
-                out.println(indent + "}");
-                out.println();
+                out.write(" {\n");
+                out.write(indent + "}\n\n");
             }
         }
     }
 
     private static void printMethods(@NotNull String indent,
                                      @NotNull Class<?> someClass,
-                                     @NotNull PrintWriter out) throws IOException {
+                                     @NotNull Writer out) throws IOException {
         for (Method method : someClass.getDeclaredMethods()) {
             if (!method.isSynthetic()) {
                 printMethodHeader(indent, method, out);
+                out.write(" {\n");
                 Class returnType = method.getReturnType();
                 if (returnType == void.class) {
-                    out.println();
+                    out.write("\n");
                 } else {
-                    out.print(indent + "    " + "return ");
+                    out.write(indent + "    " + "return ");
                     if (returnType == boolean.class) {
-                        out.println("false;");
+                        out.write("false;\n");
                     } else if (returnType.isPrimitive()) {
-                        out.println("0;");
+                        out.write("0;\n");
                     } else {
-                        out.println("null;");
+                        out.write("null;\n");
                     }
                 }
-                out.println(indent + "}");
-                out.println();
+                out.write(indent + "}\n\n");
             }
         }
     }
@@ -159,7 +168,7 @@ public class Reflector {
 
     private static void printInnerAndNestedClasses(@NotNull String indent,
                                                    @NotNull Class<?> someClass,
-                                                   @NotNull PrintWriter out) throws IOException {
+                                                   @NotNull Writer out) throws IOException {
         for (Class<?> clazz : someClass.getDeclaredClasses()) {
             printClass(indent, clazz, Modifier.isStatic(clazz.getModifiers()) ? null : someClass, out);
         }
@@ -167,9 +176,9 @@ public class Reflector {
 
     private static void printTypeParameters(@NotNull Package currentPackage,
                                             @NotNull TypeVariable[] types,
-                                            @NotNull PrintWriter out) throws IOException {
+                                            @NotNull Writer out) throws IOException {
         if (types.length > 0) {
-            out.print(Arrays.stream(types)
+            out.write(Arrays.stream(types)
                     .map(t -> {
                         String result = getShortTypeName(currentPackage, t);
                         List<String> bounds = Arrays.stream(t.getBounds())
@@ -187,45 +196,43 @@ public class Reflector {
 
     private static void printClassHeader(@NotNull String indent,
                                          @NotNull Class<?> someClass,
-                                         @NotNull PrintWriter out) throws IOException {
-        out.print(indent);
+                                         @NotNull Writer out) throws IOException {
+        out.write(indent);
         String modifiers = Modifier.toString(someClass.getModifiers());
         if (!modifiers.equals("")) {
-            out.print(modifiers + " ");
+            out.write(modifiers + " ");
         }
         if (!someClass.isInterface()) {
-            out.print("class ");
+            out.write("class ");
         }
-        out.print(someClass.getSimpleName());
+        out.write(someClass.getSimpleName());
         printTypeParameters(someClass.getPackage(), someClass.getTypeParameters(), out);
         Class<?> superclass = someClass.getSuperclass();
         if (superclass != Object.class && superclass != null) {
-            out.print(" extends");
-            out.print(" " + getShortTypeName(someClass.getPackage(), someClass.getGenericSuperclass()));
+            out.write(" extends");
+            out.write(" " + getShortTypeName(someClass.getPackage(), someClass.getGenericSuperclass()));
         }
         Type[] interfaces = someClass.getGenericInterfaces();
         if (interfaces.length > 0) {
-            out.print(" implements");
-            out.print(Arrays.stream(interfaces)
+            out.write(" implements");
+            out.write(Arrays.stream(interfaces)
                     .map(t -> getShortTypeName(someClass.getPackage(), t))
                     .collect(Collectors.joining(", ", " ", "")));
         }
-        out.println(" {");
-        out.println();
     }
 
     private static void printClass(@NotNull String indent,
                                    @NotNull Class<?> someClass,
                                    @Nullable Class<?> outerClass,
-                                   @NotNull PrintWriter out) throws IOException {
+                                   @NotNull Writer out) throws IOException {
         if (!someClass.isSynthetic()) {
             printClassHeader(indent, someClass, out);
+            out.write(" {\n\n");
             printFields(indent + "    ", someClass, out);
             printConstructors(indent + "    ", someClass, outerClass, out);
             printMethods(indent + "    ", someClass, out);
             printInnerAndNestedClasses(indent + "    ", someClass, out);
-            out.println(indent + "}");
-            out.println();
+            out.write(indent + "}\n\n");
         }
     }
 
@@ -233,24 +240,125 @@ public class Reflector {
      * Gets a class and prints its structure into a file with the corresponding name.
      * The output file is guaranteed to be successfully
      * compilable if put into the same package as the given class.
+     * Java coding conventions are followed.
      * @param someClass class to print
      */
     public static void printStructure(@NotNull Class<?> someClass) {
-        try (PrintWriter out = new PrintWriter(someClass.getSimpleName() + ".java")) {
-            out.println("package " + someClass.getPackage().getName() + ";\n");
+        try (Writer out = new PrintWriter(someClass.getSimpleName() + ".java")) {
+            out.write("package " + someClass.getPackage().getName() + ";\n\n");
             printClass("", someClass, null, out);
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
     }
 
-    public static void diffClasses(Class<?> a, Class<?> b) {
-        List<Constructor> constructorsA = Arrays.asList(a.getDeclaredConstructors());
-        List<Constructor> constructorsB = Arrays.asList(b.getDeclaredConstructors());
-        List<Constructor> common = new ArrayList<>();
-        common.addA(constructorsA);
-        common.retainAll(constructorsB);
-        constructorsA.removeAll(constructorsB);
-        constructorsB.removeAll(constructorsA);
+    @NotNull
+    private static <T> List<T> symmetricDifference(@NotNull List<T> a,
+                                                   @NotNull List<T> b,
+                                                   @NotNull BiConsumer<T, Writer> printItem) {
+        BiPredicate<T, T> equal = (c1, c2) -> {
+            StringWriter s1 = new StringWriter();
+            StringWriter s2 = new StringWriter();
+            try {
+                printItem.accept(c1, s1);
+                printItem.accept(c2, s2);
+            } catch (Exception e) {
+                return false;
+            }
+            return s1.toString().equals(s2.toString());
+        };
+        List<T> result = new ArrayList<>(a);
+        for (T x : b) {
+            result.add(x);
+            for (T y : a) {
+                if (equal.test(x, y)) {
+                    result.remove(x);
+                    result.remove(y);
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Compares fields and methods of two classes ad prints the difference
+     *
+     * Two fields are equal when they have the same generic type and name
+     * (e.g. <code>class Class1&lt;T&gt; { T x; }</code> is not equal to
+     * <code>class Class2&lt;E&gt; { E x; }</code>)
+     *
+     * Two constructors are equal when they have the same set of argument types
+     * (e.g. <code>Class1(String s);</code> is equal to <code>Class2(String s);</code>)
+     * or if they take argument of the opposite class
+     * (e.g. <code>Class1(Class2 c);</code> is equal to <code>Class2(Class1 c);</code>)
+     * or of the declaring class
+     * (e.g. <code>Class1(Class1 c);</code> is equal to <code>Class2(Class2 c);</code>)
+     *
+     * Two methods are equal when they have the same name and set of argument types
+     *
+     * @param a first compared class
+     * @param b second compared class
+     * @return true if the classes are equal, false otherwise
+     */
+    public static boolean diffClasses(@NotNull Class<?> a,
+                                      @NotNull Class<?> b) {
+        List<Constructor> constructors = symmetricDifference(
+                Arrays.asList(a.getDeclaredConstructors()),
+                Arrays.asList(b.getDeclaredConstructors()),
+                (c, w) -> {
+                    try {
+                        Writer tmpWriter = new StringWriter();
+                        printConstructorHeader("", c, null, tmpWriter);
+                        if (c.getDeclaringClass().equals(a)) {
+                            w.write(tmpWriter
+                                    .toString()
+                                    .replace(a.getSimpleName(), "%1%")
+                                    .replace(b.getSimpleName(), "%2%"));
+                        } else {
+                            w.write(tmpWriter
+                                    .toString()
+                                    .replace(b.getSimpleName(), "%1%")
+                                    .replace(a.getSimpleName(), "%2%"));
+                        }
+                    } catch (Exception ignored) {}
+                });
+        List<Method> methods = symmetricDifference(
+                Arrays.asList(a.getDeclaredMethods()),
+                Arrays.asList(b.getDeclaredMethods()),
+                (m, w) -> {
+                    try {
+                        printMethodHeader("", m, w);
+                    } catch (Exception ignored) {}
+                });
+        List<Field> fields = symmetricDifference(
+                Arrays.asList(a.getDeclaredFields()),
+                Arrays.asList(b.getDeclaredFields()),
+                (f, w) -> {
+                    try {
+                        printField("", f, w);
+                    } catch (Exception ignored) {}
+                });
+        try {
+            PrintWriter sOut = new PrintWriter(System.out);
+            for (Field field : fields) {
+                sOut.write("/* " + field.getDeclaringClass().getName() + " */\n");
+                printField("", field, sOut);
+            }
+            for (Constructor constructor : constructors) {
+                sOut.write("/* " + constructor.getDeclaringClass().getName() + " */\n");
+                printConstructorHeader("", constructor, null, sOut);
+                sOut.write(";\n\n");
+            }
+            for (Method method : methods) {
+                sOut.write("/* " + method.getDeclaringClass().getName() + " */\n");
+                printMethodHeader("", method, sOut);
+                sOut.write(";\n\n");
+            }
+            sOut.flush();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return constructors.isEmpty() && methods.isEmpty() && fields.isEmpty();
     }
 }
