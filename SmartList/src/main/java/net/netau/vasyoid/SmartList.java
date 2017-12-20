@@ -2,17 +2,27 @@ package net.netau.vasyoid;
 
 import java.util.*;
 
+/**
+ * A list optimized for small numbers of elements
+ * @param <E> elements type
+ */
 public class SmartList<E> extends AbstractList<E> implements List<E> {
 
     private static final int SMALL_SIZE = 5;
     private int listSize;
     private Object data;
 
+    /**
+     * Empty constructor
+     */
     public SmartList() {
         listSize = 0;
         data = null;
     }
 
+    /**
+     * Empty which takes a collection and creates a list of its elements
+     */
     public SmartList(Collection<? extends E> collection) {
         listSize = collection.size();
         if (listSize > SMALL_SIZE) {
@@ -31,6 +41,12 @@ public class SmartList<E> extends AbstractList<E> implements List<E> {
         return listSize;
     }
 
+    /**
+     * Replaces the element at the specified position in this list with the specified element.
+     * @param index index of the element to replace
+     * @param element element to be stored at the specified position
+     * @return the element previously at the specified position
+     */
     @SuppressWarnings("unchecked")
     @Override
     public E set(int index, E element) {
@@ -45,6 +61,11 @@ public class SmartList<E> extends AbstractList<E> implements List<E> {
         return result;
     }
 
+    /**
+     * Returns the element at the specified position in this list.
+     * @param index index of the element to return
+     * @return the element at the specified position in this list
+     */
     @SuppressWarnings("unchecked")
     @Override
     public E get(int index) {
@@ -62,6 +83,11 @@ public class SmartList<E> extends AbstractList<E> implements List<E> {
         return result;
     }
 
+    /**
+     * Appends the specified element to the end of this list.
+     * @param element element to be appended to this list
+     * @return true
+     */
     @SuppressWarnings("unchecked")
     @Override
     public boolean add(E element) {
@@ -83,6 +109,13 @@ public class SmartList<E> extends AbstractList<E> implements List<E> {
         return true;
     }
 
+    /**
+     * Removes the element at the specified position in this list.
+     * Shifts any subsequent elements to the left (subtracts one from their indices).
+     * Returns the element that was removed from the list.
+     * @param index the index of the element to be removed
+     * @return the element previously at the specified position
+     */
     @SuppressWarnings("unchecked")
     @Override
     public E remove(int index) {
@@ -92,9 +125,7 @@ public class SmartList<E> extends AbstractList<E> implements List<E> {
         } else if (listSize == 2) {
             data = ((E[]) data)[1 - index];
         } else if (listSize <= SMALL_SIZE) {
-            for (int i = index; i < listSize - 1; i++) {
-                ((E[]) data)[i] = ((E[]) data)[i + 1];
-            }
+            System.arraycopy(((E[]) data), index + 1, ((E[]) data), index, listSize - 1 - index);
         } else if (listSize == SMALL_SIZE + 1) {
             ((ArrayList<E>) data).remove(index);
             data = ((ArrayList<E>) data).toArray();
