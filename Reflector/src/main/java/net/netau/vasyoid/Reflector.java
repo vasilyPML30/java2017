@@ -12,6 +12,9 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * Implements a function to print the interior af a class.
+ */
 public class Reflector {
 
     @NotNull
@@ -228,6 +231,12 @@ public class Reflector {
         }
     }
 
+    /**
+     * Gets a class and prints its structure into a file with the corresponding name.
+     * The output file is guaranteed to be successfully
+     * compilable if put into the same package as the given class.
+     * @param someClass class to print
+     */
     public static void printStructure(@NotNull Class<?> someClass) {
         try (PrintWriter out = new PrintWriter(someClass.getSimpleName() + ".java")) {
             out.println("package " + someClass.getPackage().getName() + ";\n");
