@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.*;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -15,7 +16,7 @@ public class Reflector {
         if (!result.startsWith(currentPackage.getName())) {
             return result;
         }
-        return result.replaceAll(".*(\\$|\\.)", "");
+        return result.replaceAll(".*([$.])", "");
     }
 
     private static void printFields(String indent,
@@ -158,12 +159,22 @@ public class Reflector {
     }
 
     private static void printTypeParameters(Package currentPackage,
-                                            Type[] types,
+                                            TypeVariable[] types,
                                             PrintWriter out) throws IOException {
         if (types.length > 0) {
             out.print(Arrays.stream(types)
-                    .map(t -> getShortTypeName(currentPackage, t))
-                    .collect(Collectors.joining(", ", "<", ">")));
+                    .map(t -> {
+                        String result = getShortTypeName(currentPackage, t);
+                        List<String> bounds = Arrays.stream(t.getBounds())
+                                .map(b -> getShortTypeName(currentPackage, b))
+                                .filter(s -> !s.equals("java.lang.Object"))
+                                .collect(Collectors.toList());
+                        if (!bounds.isEmpty()) {
+                            result += bounds.stream().collect(Collectors.joining(" & ", " extends ", ""));
+                        }
+                        return result;
+                    })
+                    .collect(Collectors.joining(", ", "<", "")) + ">");
         }
     }
 
@@ -213,6 +224,7 @@ public class Reflector {
 
     public static void printStructure(Class<?> someClass) {
         try (PrintWriter out = new PrintWriter(someClass.getSimpleName() + ".java")) {
+            out.println("package " + someClass.getPackage().getName() + ";\n");
             printClass("", someClass, null, out);
         } catch (IOException e) {
             System.out.println(e.getMessage());

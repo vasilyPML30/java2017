@@ -15,7 +15,7 @@ public class SomeClass<T, S, F> extends java.util.AbstractSet<S> implements java
     public SomeClass() {
     }
 
-    protected static double asd() {
+    protected static <E extends java.lang.Throwable> double asd() throws E {
         return 0;
     }
 
@@ -23,7 +23,7 @@ public class SomeClass<T, S, F> extends java.util.AbstractSet<S> implements java
         return null;
     }
 
-    private static <R, P, E> P foo2(R arg1) {
+    private static <R, P, E extends SomeClass & java.io.Serializable> P foo2(R arg1) {
         return null;
     }
 
@@ -108,3 +108,4 @@ public class SomeClass<T, S, F> extends java.util.AbstractSet<S> implements java
     }
 
 }
+
