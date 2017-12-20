@@ -15,7 +15,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Implements a function to print the interior af a class.
+ * Implements a functions to print the interior of a class and to compare two classes
  */
 public class Reflector {
 
