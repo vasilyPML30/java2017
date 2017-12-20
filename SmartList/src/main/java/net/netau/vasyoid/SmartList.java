@@ -1,5 +1,8 @@
 package net.netau.vasyoid;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.*;
 
 /**
@@ -23,7 +26,7 @@ public class SmartList<E> extends AbstractList<E> implements List<E> {
     /**
      * Empty which takes a collection and creates a list of its elements
      */
-    public SmartList(Collection<? extends E> collection) {
+    public SmartList(@NotNull Collection<? extends E> collection) {
         listSize = collection.size();
         if (listSize > SMALL_SIZE) {
             data = new ArrayList<>(collection);
@@ -48,8 +51,9 @@ public class SmartList<E> extends AbstractList<E> implements List<E> {
      * @return the element previously at the specified position
      */
     @SuppressWarnings("unchecked")
+    @Nullable
     @Override
-    public E set(int index, E element) {
+    public E set(int index, @Nullable E element) {
         E result = get(index);
         if (listSize <= 1) {
             data = element;
@@ -68,6 +72,7 @@ public class SmartList<E> extends AbstractList<E> implements List<E> {
      */
     @SuppressWarnings("unchecked")
     @Override
+    @Nullable
     public E get(int index) {
         if (listSize == 0 || index < 0 || index >= listSize) {
             throw new IndexOutOfBoundsException();
@@ -90,7 +95,7 @@ public class SmartList<E> extends AbstractList<E> implements List<E> {
      */
     @SuppressWarnings("unchecked")
     @Override
-    public boolean add(E element) {
+    public boolean add(@Nullable E element) {
         if (listSize == 0) {
             data = element;
         } else if (listSize == 1) {
@@ -118,6 +123,7 @@ public class SmartList<E> extends AbstractList<E> implements List<E> {
      */
     @SuppressWarnings("unchecked")
     @Override
+    @Nullable
     public E remove(int index) {
         E result = get(index);
         if (listSize == 1) {
