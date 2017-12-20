@@ -111,4 +111,3 @@ public class SomeClass<T, S, F> extends java.util.AbstractSet<S> implements java
     }
 
 }
-

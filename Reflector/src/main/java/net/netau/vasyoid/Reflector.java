@@ -6,9 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.*;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -244,5 +242,15 @@ public class Reflector {
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    public static void diffClasses(Class<?> a, Class<?> b) {
+        List<Constructor> constructorsA = Arrays.asList(a.getDeclaredConstructors());
+        List<Constructor> constructorsB = Arrays.asList(b.getDeclaredConstructors());
+        List<Constructor> common = new ArrayList<>();
+        common.addA(constructorsA);
+        common.retainAll(constructorsB);
+        constructorsA.removeAll(constructorsB);
+        constructorsB.removeAll(constructorsA);
     }
 }
