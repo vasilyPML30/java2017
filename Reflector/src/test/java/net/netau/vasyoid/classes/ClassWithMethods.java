@@ -9,7 +9,7 @@ public class ClassWithMethods {
 
     }
 
-    public String fooS(int arg1) {
+    public final String fooS(int arg1) {
         return null;
     }
 

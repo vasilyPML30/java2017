@@ -27,23 +27,8 @@ public class PrintStructureTest {
     }
 
     @Test
-    public void emptyClassTest() throws Exception {
-        checkClass("EmptyClass", "EmptyClass.result");
-    }
-
-    @Test
-    public void classWithConstructorsTest() throws Exception {
-        checkClass("ClassWithConstructors");
-    }
-
-    @Test
-    public void classWithPrivateConstructorsTest() throws Exception {
-        checkClass("ClassWithPrivateConstructors");
-    }
-
-    @Test
-    public void emptyInterfaceTest() throws Exception {
-        checkClass("EmptyInterface");
+    public void abstractClassTest() throws Exception {
+        checkClass("AbstractClass");
     }
 
     @Test
@@ -52,8 +37,8 @@ public class PrintStructureTest {
     }
 
     @Test
-    public void classImplementsTest() throws Exception {
-        checkClass("ClassImplements");
+    public void classExtendsGenericTest() throws Exception {
+        checkClass("ClassExtendsGeneric");
     }
 
     @Test
@@ -62,38 +47,18 @@ public class PrintStructureTest {
     }
 
     @Test
-    public void classWithMethodsTest() throws Exception {
-        checkClass("ClassWithMethods", "ClassWithMethods.result");
+    public void classExtendsObjectTest() throws Exception {
+        checkClass("ClassExtendsObject", "ClassExtendsObject.result");
     }
 
     @Test
-    public void classWithInnerClassesTest() throws Exception {
-        checkClass("ClassWithInnerClasses");
+    public void classImplementsTest() throws Exception {
+        checkClass("ClassImplements");
     }
 
     @Test
-    public void classWithNestedClassesTest() throws Exception {
-        checkClass("ClassWithNestedClasses");
-    }
-
-    @Test
-    public void abstractClassTest() throws Exception {
-        checkClass("AbstractClass");
-    }
-
-    @Test
-    public void genericClassTest() throws Exception {
-        checkClass("GenericClass");
-    }
-
-    @Test
-    public void classWithGenericConstructorTest() throws Exception {
-        checkClass("ClassWithGenericConstructor");
-    }
-
-    @Test
-    public void classWithMethodThrowsTest() throws Exception {
-        checkClass("ClassWithMethodThrows");
+    public void classWithConstructorsTest() throws Exception {
+        checkClass("ClassWithConstructors");
     }
 
     @Test
@@ -102,13 +67,93 @@ public class PrintStructureTest {
     }
 
     @Test
-    public void classExtendsObjectTest() throws Exception {
-        checkClass("ClassExtendsObject", "ClassExtendsObject.result");
+    public void classWithFieldsTest() throws Exception {
+        checkClass("ClassWithFields");
     }
 
     @Test
-    public void classExtendsGenericTest() throws Exception {
-        checkClass("ClassExtendsGeneric");
+    public void classWithFinalFieldsTest() throws Exception {
+        checkClass("ClassWithFinalFields");
+    }
+
+    @Test
+    public void classWithGenericConstructorTest() throws Exception {
+        checkClass("ClassWithGenericConstructor");
+    }
+
+    @Test
+    public void classWithGenericFieldsTest() throws Exception {
+        checkClass("ClassWithGenericFields");
+    }
+
+    @Test
+    public void classWithGenericMethodsTest() throws Exception {
+        checkClass("ClassWithGenericMethods");
+    }
+
+    @Test
+    public void classWithInnerClassesTest() throws Exception {
+        checkClass("ClassWithInnerClasses");
+    }
+
+    @Test
+    public void classWithMethodsTest() throws Exception {
+        checkClass("ClassWithMethods", "ClassWithMethods.result");
+    }
+
+    @Test
+    public void classWithMethodThrowsTest() throws Exception {
+        checkClass("ClassWithMethodThrows");
+    }
+
+    @Test
+    public void classWithMethodThrowsGenericTest() throws Exception {
+        checkClass("ClassWithMethodThrowsGeneric");
+    }
+
+    @Test
+    public void classWithMethodWithMultipleArgumentsTest() throws Exception {
+        checkClass("ClassWithMethodWithMultipleArguments", "ClassWithMethodWithMultipleArguments.result");
+    }
+
+
+    @Test
+    public void classWithNestedClassesTest() throws Exception {
+        checkClass("ClassWithNestedClasses");
+    }
+
+    @Test
+    public void classWithPrivateConstructorsTest() throws Exception {
+        checkClass("ClassWithPrivateConstructors");
+    }
+
+    @Test
+    public void emptyClassTest() throws Exception {
+        checkClass("EmptyClass", "EmptyClass.result");
+    }
+
+    @Test
+    public void emptyInterfaceTest() throws Exception {
+        checkClass("EmptyInterface");
+    }
+
+    @Test
+    public void genericClassTest() throws Exception {
+        checkClass("GenericClass");
+    }
+
+    @Test
+    public void interfaceExtendsTest() throws Exception {
+        checkClass("InterfaceExtends");
+    }
+
+    @Test
+    public void classReflectorTest() throws Exception {
+        StringWriter out = new StringWriter();
+        Reflector.printStructure(Class.forName("net.netau.vasyoid.Reflector"), out);
+        assertEquals(Files.lines(Paths.get(CLASSES_DIR + "Reflector.result"))
+                .collect(Collectors.joining("\n")), out.toString());
+
     }
 
 }

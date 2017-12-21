@@ -39,7 +39,11 @@ public class Reflector {
         }
         out.write(getShortTypeName(someField.getDeclaringClass().getPackage(),
                 someField.getGenericType()));
-        out.write(" " + someField.getName() + ";\n\n");
+        out.write(" " + someField.getName());
+        if (Modifier.isFinal(someField.getModifiers())) {
+            out.write(" = " + getDefaultValue(someField.getType()));
+        }
+        out.write(";\n\n");
 
     }
 
@@ -133,7 +137,15 @@ public class Reflector {
                                           @NotNull Class<?> someClass,
                                           @Nullable Class<?> outerClass,
                                           @NotNull Writer out) throws IOException {
-        for (Constructor constructor : someClass.getDeclaredConstructors()) {
+        Constructor<?>[] constructors = someClass.getDeclaredConstructors();
+        Arrays.sort(constructors, Comparator.comparing((Constructor<?> c) -> {
+            StringWriter sw = new StringWriter();
+            try {
+                printConstructorHeader("", c, outerClass, sw);
+            } catch (Exception ignored) {}
+            return sw.toString();
+        }));
+        for (Constructor constructor : constructors) {
             if (!constructor.isSynthetic()) {
                 printConstructorHeader(indent, constructor, outerClass, out);
                 out.write(" {\n");
@@ -142,12 +154,26 @@ public class Reflector {
         }
     }
 
+    private static String getDefaultValue(@NotNull Class<?> type) {
+        if (type == boolean.class) {
+            return "false";
+        } else if (type.isPrimitive()) {
+            return"0";
+        }
+        return "null";
+    }
+
     private static void printMethods(@NotNull String indent,
                                      @NotNull Class<?> someClass,
                                      @NotNull Writer out) throws IOException {
         Method[] methods = someClass.getDeclaredMethods();
-        Arrays.sort(methods, Comparator.comparing(m ->
-                m.getName() + m.getGenericReturnType().getTypeName()));
+        Arrays.sort(methods, Comparator.comparing(m -> {
+            StringWriter sw = new StringWriter();
+            try {
+                printMethodHeader("", m, sw);
+            } catch (Exception ignored) {}
+            return m.getName() + m.getGenericReturnType().getTypeName() + sw.toString();
+        }));
         for (Method method : methods) {
             if (!method.isSynthetic()) {
                 printMethodHeader(indent, method, out);
@@ -161,19 +187,13 @@ public class Reflector {
                     out.write("\n");
                 } else {
                     out.write(indent + "    " + "return ");
-                    if (returnType == boolean.class) {
-                        out.write("false;\n");
-                    } else if (returnType.isPrimitive()) {
-                        out.write("0;\n");
-                    } else {
-                        out.write("null;\n");
-                    }
+                    out.write(getDefaultValue(returnType));
+                    out.write(";\n");
                 }
                 out.write(indent + "}\n\n");
             }
         }
     }
-
 
     private static void printInnerAndNestedClasses(@NotNull String indent,
                                                    @NotNull Class<?> someClass,
@@ -225,7 +245,11 @@ public class Reflector {
         }
         Type[] interfaces = someClass.getGenericInterfaces();
         if (interfaces.length > 0) {
-            out.write(" implements");
+            if (someClass.isInterface()) {
+                out.write(" extends");
+            } else {
+                out.write(" implements");
+            }
             out.write(Arrays.stream(interfaces)
                     .map(t -> getShortTypeName(someClass.getPackage(), t))
                     .collect(Collectors.joining(", ", " ", "")));

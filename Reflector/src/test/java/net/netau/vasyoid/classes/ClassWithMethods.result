@@ -29,7 +29,7 @@ public class ClassWithMethods {
         return null;
     }
 
-    public java.lang.String fooS(int arg1) {
+    public final java.lang.String fooS(int arg1) {
         return null;
     }
 

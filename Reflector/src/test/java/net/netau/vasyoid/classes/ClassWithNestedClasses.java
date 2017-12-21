@@ -5,7 +5,7 @@ public class ClassWithNestedClasses {
     public ClassWithNestedClasses() {
     }
 
-    public static class NestedClass {
+    public static final class NestedClass {
 
         public NestedClass() {
         }
