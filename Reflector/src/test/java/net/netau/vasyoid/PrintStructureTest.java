@@ -150,10 +150,11 @@ public class PrintStructureTest {
     @Test
     public void classReflectorTest() throws Exception {
         StringWriter out = new StringWriter();
-        Reflector.printStructure(Class.forName("net.netau.vasyoid.Reflector"), out);
+        Reflector.printStructure(Reflector.class, out);
         assertEquals(Files.lines(Paths.get(CLASSES_DIR + "Reflector.result"))
                 .collect(Collectors.joining("\n")), out.toString());
-
+        Reflector.printStructure(Reflector.class);
+        Files.delete(Paths.get("Reflector.java"));
     }
 
 }

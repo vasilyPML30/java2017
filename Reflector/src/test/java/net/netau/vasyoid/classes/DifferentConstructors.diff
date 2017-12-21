@@ -1,0 +1,19 @@
+/* net.netau.vasyoid.classes.DifferentConstructors$Class1 */
+Class1(DifferentConstructors arg1);
+
+/* net.netau.vasyoid.classes.DifferentConstructors$Class1 */
+Class1(DifferentConstructors arg1, DifferentConstructors$Class1 arg2);
+
+/* net.netau.vasyoid.classes.DifferentConstructors$Class1 */
+Class1(DifferentConstructors arg1, double arg2);
+
+/* net.netau.vasyoid.classes.DifferentConstructors$Class2 */
+Class2(DifferentConstructors arg1, int arg2);
+
+/* net.netau.vasyoid.classes.DifferentConstructors$Class2 */
+Class2(DifferentConstructors arg1, DifferentConstructors$Class1 arg2);
+
+/* net.netau.vasyoid.classes.DifferentConstructors$Class2 */
+Class2(DifferentConstructors arg1, double arg2) throws java.io.IOException;
+
+

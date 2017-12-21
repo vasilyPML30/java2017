@@ -3,10 +3,7 @@ package net.netau.vasyoid;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -287,14 +284,14 @@ public class Reflector {
     }
 
     /**
-     * The same as void printStructure(Class<?>) but additionally takes an outputStream
+     * The same as <code>void printStructure(Class<?>)</> but additionally takes an outputWriter
      * @param someClass class to print
      * @throws IOException when an output error occurs
      */
     public static void printStructure(@NotNull Class<?> someClass,
-                                      @NotNull Writer outputStream) throws IOException {
-        outputStream.write("package " + someClass.getPackage().getName() + ";\n\n");
-        printClass("", someClass, null, outputStream);
+                                      @NotNull Writer outputWriter) throws IOException {
+        outputWriter.write("package " + someClass.getPackage().getName() + ";\n\n");
+        printClass("", someClass, null, outputWriter);
     }
 
 
@@ -349,7 +346,21 @@ public class Reflector {
      */
     public static boolean diffClasses(@NotNull Class<?> a,
                                       @NotNull Class<?> b) {
-        List<Constructor> constructors = symmetricDifference(
+        return diffClasses(a, b, new PrintWriter(System.out));
+    }
+
+
+    /**
+     * The same as <code>boolean diffClasses(Class<?>, Class<?>)</> but additionally takes an outputWriter
+     * @param a first compared class
+     * @param b second compared class
+     * @param out writer where to write the difference
+     * @return true if the classes are equal, false otherwise
+     */
+    public static boolean diffClasses(@NotNull Class<?> a,
+                                      @NotNull Class<?> b,
+                                      @NotNull Writer out) {
+    List<Constructor> constructors = symmetricDifference(
                 Arrays.asList(a.getDeclaredConstructors()),
                 Arrays.asList(b.getDeclaredConstructors()),
                 (c, w) -> {
@@ -385,23 +396,24 @@ public class Reflector {
                         printField("", f, w);
                     } catch (Exception ignored) {}
                 });
+        fields = fields.stream().sorted(Comparator.comparing(Field::getName)).collect(Collectors.toList());
+        methods = methods.stream().sorted(Comparator.comparing(Method::getName)).collect(Collectors.toList());
         try {
-            PrintWriter sOut = new PrintWriter(System.out);
             for (Field field : fields) {
-                sOut.write("/* " + field.getDeclaringClass().getName() + " */\n");
-                printField("", field, sOut);
+                out.write("/* " + field.getDeclaringClass().getName() + " */\n");
+                printField("", field, out);
             }
             for (Constructor constructor : constructors) {
-                sOut.write("/* " + constructor.getDeclaringClass().getName() + " */\n");
-                printConstructorHeader("", constructor, null, sOut);
-                sOut.write(";\n\n");
+                out.write("/* " + constructor.getDeclaringClass().getName() + " */\n");
+                printConstructorHeader("", constructor, null, out);
+                out.write(";\n\n");
             }
             for (Method method : methods) {
-                sOut.write("/* " + method.getDeclaringClass().getName() + " */\n");
-                printMethodHeader("", method, sOut);
-                sOut.write(";\n\n");
+                out.write("/* " + method.getDeclaringClass().getName() + " */\n");
+                printMethodHeader("", method, out);
+                out.write(";\n\n");
             }
-            sOut.flush();
+            out.flush();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

@@ -9,6 +9,10 @@ public class Reflector {
         return false;
     }
 
+    public static boolean diffClasses(java.lang.Class<?> arg1, java.lang.Class<?> arg2, java.io.Writer arg3) {
+        return false;
+    }
+
     private static java.lang.String getDefaultValue(java.lang.Class<?> arg1) {
         return null;
     }
