@@ -26,7 +26,7 @@ public class Reflector {
         if (!result.startsWith(currentPackage.getName())) {
             return result;
         }
-        return result.replaceAll(".*([$.])", "");
+        return result.replaceAll(currentPackage.getName() + ".", "");
     }
 
     private static void printField(@NotNull String indent,
@@ -46,7 +46,9 @@ public class Reflector {
         private static void printFields(@NotNull String indent,
                                         @NotNull Class<?> someClass,
                                         @NotNull Writer out) throws IOException {
-        for (Field field : someClass.getDeclaredFields()) {
+        Field[] fields = someClass.getDeclaredFields();
+        Arrays.sort(fields, Comparator.comparing(Field::getName));
+        for (Field field : fields) {
             if (!field.isSynthetic()) {
                 printField(indent, field, out);
             }
@@ -143,9 +145,16 @@ public class Reflector {
     private static void printMethods(@NotNull String indent,
                                      @NotNull Class<?> someClass,
                                      @NotNull Writer out) throws IOException {
-        for (Method method : someClass.getDeclaredMethods()) {
+        Method[] methods = someClass.getDeclaredMethods();
+        Arrays.sort(methods, Comparator.comparing(m ->
+                m.getName() + m.getGenericReturnType().getTypeName()));
+        for (Method method : methods) {
             if (!method.isSynthetic()) {
                 printMethodHeader(indent, method, out);
+                if (Modifier.isAbstract(method.getModifiers())) {
+                    out.write(";\n\n");
+                    continue;
+                }
                 out.write(" {\n");
                 Class returnType = method.getReturnType();
                 if (returnType == void.class) {
@@ -169,7 +178,9 @@ public class Reflector {
     private static void printInnerAndNestedClasses(@NotNull String indent,
                                                    @NotNull Class<?> someClass,
                                                    @NotNull Writer out) throws IOException {
-        for (Class<?> clazz : someClass.getDeclaredClasses()) {
+        Class<?>[] classes = someClass.getDeclaredClasses();
+        Arrays.sort(classes, Comparator.comparing(Class::getName));
+        for (Class<?> clazz : classes) {
             printClass(indent, clazz, Modifier.isStatic(clazz.getModifiers()) ? null : someClass, out);
         }
     }
@@ -245,12 +256,23 @@ public class Reflector {
      */
     public static void printStructure(@NotNull Class<?> someClass) {
         try (Writer out = new PrintWriter(someClass.getSimpleName() + ".java")) {
-            out.write("package " + someClass.getPackage().getName() + ";\n\n");
-            printClass("", someClass, null, out);
+            printStructure(someClass, out);
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
     }
+
+    /**
+     * The same as void printStructure(Class<?>) but additionally takes an outputStream
+     * @param someClass class to print
+     * @throws IOException when an output error occurs
+     */
+    public static void printStructure(@NotNull Class<?> someClass,
+                                      @NotNull Writer outputStream) throws IOException {
+        outputStream.write("package " + someClass.getPackage().getName() + ";\n\n");
+        printClass("", someClass, null, outputStream);
+    }
+
 
     @NotNull
     private static <T> List<T> symmetricDifference(@NotNull List<T> a,
