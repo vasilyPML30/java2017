@@ -2,12 +2,12 @@ package net.netau.vasyoid;
 
 import org.junit.Test;
 
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static net.netau.vasyoid.ExpressionEntity.EntityType.*;
 import static org.junit.Assert.*;
+
 public class PostfixNotationHelperTest {
 
     @Test
@@ -43,7 +43,7 @@ public class PostfixNotationHelperTest {
                         PostfixNotationHelper.infixToPostfix("(1 + 2) * 3 / 4 - 5")));
     }
 
-    @Test(expected = InvalidParameterException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void invalidBracketsTest() {
         PostfixNotationHelper.infixToPostfix("2+3)");
     }

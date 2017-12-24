@@ -2,7 +2,6 @@ package net.netau.vasyoid;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.security.InvalidParameterException;
 import java.util.List;
 
 import static net.netau.vasyoid.ExpressionEntity.EntityType.VALUE;
@@ -14,7 +13,7 @@ public class Calculator {
 
     private MyStack<ExpressionEntity> stack;
 
-    Calculator(@NotNull MyStack<ExpressionEntity> stack) {
+    public Calculator(@NotNull MyStack<ExpressionEntity> stack) {
         this.stack = stack;
     }
 
@@ -22,9 +21,9 @@ public class Calculator {
      * Evaluates an expression value.
      * @param expression expression to evaluate.
      * @return the result of evaluation.
-     * @throws InvalidParameterException if given expression is incorrect.
+     * @throws IllegalArgumentException if given expression is incorrect.
      */
-    double evaluate(@NotNull List<ExpressionEntity> expression) throws InvalidParameterException {
+    public double evaluate(@NotNull List<ExpressionEntity> expression) throws IllegalArgumentException {
         double result;
         try {
             expression.forEach(entity -> {
@@ -41,7 +40,7 @@ public class Calculator {
                 throw new Exception();
             }
         } catch (Exception e) {
-            throw new InvalidParameterException("Expression format is invalid");
+            throw new IllegalArgumentException("Expression format is invalid");
         }
         return result;
     }

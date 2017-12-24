@@ -2,8 +2,6 @@ package net.netau.vasyoid;
 
 import org.junit.Test;
 
-import javax.management.ValueExp;
-
 import static net.netau.vasyoid.ExpressionEntity.EntityType.*;
 import static org.junit.Assert.*;
 

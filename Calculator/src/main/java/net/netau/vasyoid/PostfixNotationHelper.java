@@ -2,11 +2,9 @@ package net.netau.vasyoid;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import static net.netau.vasyoid.ExpressionEntity.EntityType.*;
@@ -30,10 +28,10 @@ public class PostfixNotationHelper {
      * Converts an expression into postfix notation.
      * @param expression expression to infixToPostfix.
      * @return resulting expression.
-     * @throws InvalidParameterException if given expression is incorrect.
+     * @throws IllegalArgumentException if given expression is incorrect.
      */
     public static List<ExpressionEntity> infixToPostfix(String expression)
-            throws InvalidParameterException {
+            throws IllegalArgumentException {
         List<ExpressionEntity> result = new ArrayList<>();
         MyStack<ExpressionEntity> stack = new MyStack<>();
         stack.push(new ExpressionEntity(LEFT_BRACKET));
@@ -73,7 +71,7 @@ public class PostfixNotationHelper {
             }
         }
         catch (Exception e) {
-            throw new InvalidParameterException("Expression format is invalid");
+            throw new IllegalArgumentException("Expression format is invalid");
         }
         return result;
     }

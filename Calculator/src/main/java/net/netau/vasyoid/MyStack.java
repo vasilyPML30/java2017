@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class MyStack<T> {
 
-    private Node head;
+    private Node<T> head;
 
     /**
      * Checks whether the stack is empty.
@@ -52,14 +52,14 @@ public class MyStack<T> {
      * @param element value of the element to add.
      */
     public void push(@NotNull T element) {
-        head = new Node(head, element);
+        head = new Node<>(head, element);
     }
 
-    private class Node {
-        private Node next;
+    private static class Node<T> {
+        private Node<T> next;
         private T value;
 
-        Node(@Nullable Node next, @NotNull T value) {
+        Node(@Nullable Node<T> next, @NotNull T value) {
             this.value = value;
             this.next = next;
         }

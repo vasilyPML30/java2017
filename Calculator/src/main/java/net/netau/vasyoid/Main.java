@@ -2,7 +2,6 @@ package net.netau.vasyoid;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.security.InvalidParameterException;
 import java.util.List;
 
 /**
@@ -22,7 +21,7 @@ public class Main {
             double result = calculator.evaluate(expression);
             System.out.println(PostfixNotationHelper.expressionToString(expression));
             System.out.println(result);
-        } catch (InvalidParameterException e) {
+        } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
             System.exit(-1);
         }

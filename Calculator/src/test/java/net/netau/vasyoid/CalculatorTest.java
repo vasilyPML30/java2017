@@ -2,13 +2,9 @@ package net.netau.vasyoid;
 
 import org.junit.Test;
 import org.mockito.InOrder;
-import org.mockito.Mock;
 
-import java.security.InvalidParameterException;
-import java.util.ArrayList;
 import java.util.List;
 
-import static net.netau.vasyoid.ExpressionEntity.EntityType.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -54,25 +50,25 @@ public class CalculatorTest {
         checker.verify(stack).isEmpty();
     }
 
-    @Test(expected = InvalidParameterException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void evaluateNoOperandsTest() {
         Calculator calculator = new Calculator(new MyStack<>());
         calculator.evaluate(PostfixNotationHelper.infixToPostfix("+"));
     }
 
-    @Test(expected = InvalidParameterException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void evaluateOneOperandTest() {
         Calculator calculator = new Calculator(new MyStack<>());
         calculator.evaluate(PostfixNotationHelper.infixToPostfix("3+"));
     }
 
-    @Test(expected = InvalidParameterException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void evaluateNoOperatorTest() {
         Calculator calculator = new Calculator(new MyStack<>());
         calculator.evaluate(PostfixNotationHelper.infixToPostfix("3 4"));
     }
 
-    @Test(expected = InvalidParameterException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void evaluateIncorrectBracketsTest() {
         Calculator calculator = new Calculator(new MyStack<>());
         calculator.evaluate(PostfixNotationHelper.infixToPostfix("(3 + 5))"));
