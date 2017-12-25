@@ -1,0 +1,19 @@
+/* net.netau.vasyoid.classes.DifferentFields$Class1 */
+java.util.List<java.lang.Boolean> list;
+
+/* net.netau.vasyoid.classes.DifferentFields$Class2 */
+java.util.List<java.lang.Integer> list;
+
+/* net.netau.vasyoid.classes.DifferentFields$Class1 */
+T x;
+
+/* net.netau.vasyoid.classes.DifferentFields$Class2 */
+E x;
+
+/* net.netau.vasyoid.classes.DifferentFields$Class1 */
+int y;
+
+/* net.netau.vasyoid.classes.DifferentFields$Class2 */
+int z;
+
+

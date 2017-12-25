@@ -1,0 +1,31 @@
+/* net.netau.vasyoid.classes.DifferentMethods$Class1 */
+public void bar();
+
+/* net.netau.vasyoid.classes.DifferentMethods$Class2 */
+void bar();
+
+/* net.netau.vasyoid.classes.DifferentMethods$Class1 */
+public void foo();
+
+/* net.netau.vasyoid.classes.DifferentMethods$Class2 */
+private void foo();
+
+/* net.netau.vasyoid.classes.DifferentMethods$Class1 */
+void foo2() throws java.io.IOException;
+
+/* net.netau.vasyoid.classes.DifferentMethods$Class2 */
+void foo2() throws java.io.FileNotFoundException;
+
+/* net.netau.vasyoid.classes.DifferentMethods$Class1 */
+int foo3();
+
+/* net.netau.vasyoid.classes.DifferentMethods$Class2 */
+java.lang.Integer foo3();
+
+/* net.netau.vasyoid.classes.DifferentMethods$Class1 */
+<T> void foo4(T arg1);
+
+/* net.netau.vasyoid.classes.DifferentMethods$Class2 */
+<E> void foo4(E arg1);
+
+

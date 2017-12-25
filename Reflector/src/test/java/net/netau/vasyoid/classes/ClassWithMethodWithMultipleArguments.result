@@ -1,0 +1,14 @@
+package net.netau.vasyoid.classes;
+
+public abstract class ClassWithMethodWithMultipleArguments {
+
+    public ClassWithMethodWithMultipleArguments() {
+    }
+
+    void foo(int arg1, double arg2, boolean arg3, java.lang.String arg4, MyPair arg5, EmptyInterface arg6) {
+
+    }
+
+}
+
+

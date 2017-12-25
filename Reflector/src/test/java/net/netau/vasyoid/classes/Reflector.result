@@ -1,0 +1,86 @@
+package net.netau.vasyoid;
+
+public class Reflector {
+
+    public Reflector() {
+    }
+
+    public static boolean diffClasses(java.lang.Class<?> arg1, java.lang.Class<?> arg2) {
+        return false;
+    }
+
+    public static boolean diffClasses(java.lang.Class<?> arg1, java.lang.Class<?> arg2, java.io.Writer arg3) {
+        return false;
+    }
+
+    private static java.lang.String getDefaultValue(java.lang.Class<?> arg1) {
+        return null;
+    }
+
+    private static java.lang.String getShortTypeName(java.lang.Package arg1, java.lang.reflect.Type arg2) {
+        return null;
+    }
+
+    private static void printArguments(java.lang.Package arg1, java.lang.reflect.Type[] arg2, java.io.Writer arg3) throws java.io.IOException {
+
+    }
+
+    private static void printClassHeader(java.lang.String arg1, java.lang.Class<?> arg2, java.io.Writer arg3) throws java.io.IOException {
+
+    }
+
+    private static void printClass(java.lang.String arg1, java.lang.Class<?> arg2, java.lang.Class<?> arg3, java.io.Writer arg4) throws java.io.IOException {
+
+    }
+
+    private static void printConstructorHeader(java.lang.String arg1, java.lang.reflect.Constructor arg2, java.lang.Class<?> arg3, java.io.Writer arg4) throws java.io.IOException {
+
+    }
+
+    private static void printConstructors(java.lang.String arg1, java.lang.Class<?> arg2, java.lang.Class<?> arg3, java.io.Writer arg4) throws java.io.IOException {
+
+    }
+
+    private static void printExceptions(java.lang.Package arg1, java.lang.reflect.Type[] arg2, java.io.Writer arg3) throws java.io.IOException {
+
+    }
+
+    private static void printFields(java.lang.String arg1, java.lang.Class<?> arg2, java.io.Writer arg3) throws java.io.IOException {
+
+    }
+
+    private static void printField(java.lang.String arg1, java.lang.reflect.Field arg2, java.io.Writer arg3) throws java.io.IOException {
+
+    }
+
+    private static void printInnerAndNestedClasses(java.lang.String arg1, java.lang.Class<?> arg2, java.io.Writer arg3) throws java.io.IOException {
+
+    }
+
+    private static void printMethodHeader(java.lang.String arg1, java.lang.reflect.Method arg2, java.io.Writer arg3) throws java.io.IOException {
+
+    }
+
+    private static void printMethods(java.lang.String arg1, java.lang.Class<?> arg2, java.io.Writer arg3) throws java.io.IOException {
+
+    }
+
+    public static void printStructure(java.lang.Class<?> arg1) {
+
+    }
+
+    public static void printStructure(java.lang.Class<?> arg1, java.io.Writer arg2) throws java.io.IOException {
+
+    }
+
+    private static void printTypeParameters(java.lang.Package arg1, java.lang.reflect.TypeVariable[] arg2, java.io.Writer arg3) throws java.io.IOException {
+
+    }
+
+    private static <T> java.util.List<T> symmetricDifference(java.util.List<T> arg1, java.util.List<T> arg2, java.util.function.BiConsumer<T, java.io.Writer> arg3) {
+        return null;
+    }
+
+}
+
+
