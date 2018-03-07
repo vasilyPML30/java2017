@@ -107,8 +107,8 @@ public class ThreadPoolImpl {
                 error = new LightExecutionException("Evaluation failed");
                 error.addSuppressed(e);
             }
-            notifyAll();
             ready = true;
+            notifyAll();
         }
 
         /**
