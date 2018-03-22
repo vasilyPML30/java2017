@@ -9,4 +9,6 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile group: 'org.jetbrains', name: 'annotations', version: '15.0'
+    compile 'org.mockito:mockito-core:2.12.0'
 }

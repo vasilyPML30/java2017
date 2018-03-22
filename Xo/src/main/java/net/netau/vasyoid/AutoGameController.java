@@ -1,5 +1,7 @@
 package net.netau.vasyoid;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.*;
 
 /**
@@ -17,7 +19,7 @@ public class AutoGameController extends GameController {
     private MyView view;
     private Map<Integer, BoardState> isWinningPosition  = new HashMap<>();
 
-    AutoGameController(MyView view, Level currentLevel, CellState autoUnit) {
+    AutoGameController(@NotNull MyView view, @NotNull Level currentLevel, @NotNull CellState autoUnit) {
         this.view = view;
         this.currentLevel = currentLevel;
         this.autoState = autoUnit.equals(CellState.CROSS) ?
@@ -42,7 +44,7 @@ public class AutoGameController extends GameController {
         calculateMoves(board);
     }
 
-    private int boardToMask(CellState[][] board) {
+    private int boardToMask(@NotNull CellState[][] board) {
         int mask = 0;
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
@@ -52,10 +54,11 @@ public class AutoGameController extends GameController {
         return mask;
     }
 
+    @NotNull
     private CellState[][] maskToBoard(int mask) {
         CellState[][] board = new CellState[BOARD_SIZE][BOARD_SIZE];
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            for (int j = 0; j < BOARD_SIZE; j++) {
+        for (int i = BOARD_SIZE - 1; i >= 0; i--) {
+            for (int j = BOARD_SIZE - 1; j >= 0; j--) {
                 board[i][j] = CellState.parseValue(mask % 3);
                 mask /= 3;
             }
@@ -63,7 +66,8 @@ public class AutoGameController extends GameController {
         return board;
     }
 
-    private CellState whoMovesNext(CellState[][] board) {
+    @NotNull
+    private CellState whoMovesNext(@NotNull CellState[][] board) {
         int crosses = 0, noughts = 0;
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
@@ -84,7 +88,7 @@ public class AutoGameController extends GameController {
         }
     }
 
-    private void calculateMoves(CellState[][] board) {
+    private void calculateMoves(@NotNull CellState[][] board) {
         int mask = boardToMask(board);
         if (isWinningPosition.containsKey(mask)) {
             return;
@@ -132,6 +136,7 @@ public class AutoGameController extends GameController {
             view.pressButton(cellId / BOARD_SIZE, cellId % BOARD_SIZE);
         } else {
             int curMask = boardToMask(board);
+            curMask = boardToMask(maskToBoard(curMask));
             calculateMoves(maskToBoard(curMask));
             BoardState curLabel = isWinningPosition.get(curMask);
             if (curLabel.equals(BoardState.LOSE)) {
@@ -157,6 +162,7 @@ public class AutoGameController extends GameController {
     /**
      * {@inheritDoc}
      */
+    @NotNull
     @Override
     public CellState move(int row, int col) {
         CellState result = super.move(row, col);

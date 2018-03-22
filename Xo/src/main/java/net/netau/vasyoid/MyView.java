@@ -12,6 +12,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import org.jetbrains.annotations.NotNull;
 
 import static net.netau.vasyoid.GameController.BOARD_SIZE;
 
@@ -64,6 +65,7 @@ public class MyView extends Application {
         titleText.setText(title);
     }
 
+    @NotNull
     private Tab createGameTab() {
         Tab gameTab = new Tab();
         GridPane pane = new GridPane();
@@ -115,6 +117,7 @@ public class MyView extends Application {
         return gameTab;
     }
 
+    @NotNull
     private Tab createSettingsTab() {
         Tab scoreTab = new Tab();
         scoreTab.setText("Настройки");
@@ -191,6 +194,7 @@ public class MyView extends Application {
         return scoreTab;
     }
 
+    @NotNull
     private Tab createScoreTab() {
         Tab scoreTab = new Tab();
         scoreTab.setText("Результаты игр");
@@ -216,7 +220,7 @@ public class MyView extends Application {
      * @param primaryStage layout to place the elements.
      */
     @Override
-    public void start(Stage primaryStage) {
+    public void start(@NotNull Stage primaryStage) {
         controller = new GameController();
         titleText.setTextAlignment(TextAlignment.CENTER);
         primaryStage.setTitle("Крестики-нолики");
@@ -248,16 +252,19 @@ public class MyView extends Application {
             this.result = new SimpleStringProperty(result);
         }
 
+        @NotNull
         @SuppressWarnings("unused")
         public String getFirstPlayerName() {
             return firstPlayerName.get();
         }
 
+        @NotNull
         @SuppressWarnings("unused")
         public String getSecondPlayerName() {
             return secondPlayerName.get();
         }
 
+        @NotNull
         @SuppressWarnings("unused")
         public String getResult() {
             return result.get();

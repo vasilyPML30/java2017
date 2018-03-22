@@ -1,5 +1,8 @@
 package net.netau.vasyoid;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 /**
  * Base game controller class.
  * Controls game state and handles players' moves.
@@ -29,7 +32,8 @@ public class GameController {
         return gameOver;
     }
 
-    protected BoardState isWin(CellState potentialWinner, CellState[][] board) {
+    @NotNull
+    protected BoardState isWin(@NotNull CellState potentialWinner, @NotNull CellState[][] board) {
         boolean someoneWon = false;
         boolean draw = true;
         for (int i = 0; i < BOARD_SIZE; i++) {
@@ -56,6 +60,7 @@ public class GameController {
         }
     }
 
+    @NotNull
     public GameState getCurrentGameState() {
         return currentGameState;
     }
@@ -124,10 +129,11 @@ public class GameController {
 
         private String text;
 
-        GameState(String text) {
+        GameState(@NotNull String text) {
             this.text = text;
         }
 
+        @NotNull
         @Override
         public String toString() {
             return text;
@@ -145,11 +151,12 @@ public class GameController {
         private String text;
         private int value;
 
-        CellState(String text, int value) {
+        CellState(@NotNull String text, int value) {
             this.text = text;
             this.value = value;
         }
 
+        @NotNull
         @Override
         public String toString() {
             return text;
@@ -159,6 +166,7 @@ public class GameController {
             return value;
         }
 
+        @NotNull
         public static CellState parseValue(int value) {
             switch (value) {
                 case 0:
@@ -172,6 +180,7 @@ public class GameController {
             }
         }
 
+        @NotNull
         public CellState getOpposite() {
             switch (this) {
                 case CROSS:

@@ -1,6 +1,7 @@
 package net.netau.vasyoid;
 
 import javafx.application.Application;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Main class.
@@ -12,7 +13,7 @@ public class Main {
      * Main function.
      * @param args command line arguments.
      */
-    public static void main(String[] args) {
+    public static void main(@NotNull String[] args) {
         Application.launch(MyView.class, args);
     }
 }
