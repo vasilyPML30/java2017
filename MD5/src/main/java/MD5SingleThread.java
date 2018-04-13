@@ -4,6 +4,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 /**
  * Multi Thread MD5 evaluator based on a Fork/Join pool.
@@ -36,6 +37,7 @@ public class MD5SingleThread extends MD5Evaluator {
             if (content == null) {
                 return null;
             }
+            Arrays.sort(content);
             for (File nextFile : content) {
                 byte[] result = evaluate(nextFile);
                 if (result == null) {

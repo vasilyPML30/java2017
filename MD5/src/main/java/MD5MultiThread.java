@@ -4,6 +4,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.RecursiveTask;
@@ -21,7 +22,8 @@ public class MD5MultiThread extends MD5Evaluator {
     public byte[] get(@NotNull String path) {
         try {
             ForkJoinEvaluator evaluator = new ForkJoinEvaluator(new File(path));
-            return evaluator.get();
+            evaluator.fork();
+            return evaluator.join();
         } catch (Exception e) {
             System.out.println("Something is wrong: " + e.getMessage());
             return null;
@@ -64,9 +66,12 @@ public class MD5MultiThread extends MD5Evaluator {
                 if (content == null) {
                     return null;
                 }
+                Arrays.sort(content);
                 List<ForkJoinEvaluator> subTasks = new LinkedList<>();
                 for (File nextFile : content) {
-                    subTasks.add(new ForkJoinEvaluator(nextFile));
+                    ForkJoinEvaluator task = new ForkJoinEvaluator(nextFile);
+                    subTasks.add(task);
+                    task.fork();
                 }
                 for (ForkJoinEvaluator task : subTasks) {
                     byte[] result = task.join();
