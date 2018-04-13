@@ -2,8 +2,16 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.UnsupportedEncodingException;
 
+/**
+ * Console application that evaluates MD5 checksum of a directory.
+ */
 public class Main {
 
+    /**
+     * Run an evaluator.
+     * @param evaluator evaluator to run.
+     * @param path path to pass to evaluator.
+     */
     private static void runEvaluator(@NotNull MD5Evaluator evaluator, String path) {
         long startTime = System.currentTimeMillis();
         byte[] result = evaluator.get(path);
@@ -17,6 +25,10 @@ public class Main {
         System.out.println(currentTime - startTime);
     }
 
+    /**
+     * Runs two types of evaluators and outputs the result and time.
+     * @param args directory path.
+     */
     public static void main(String[] args) {
         if (args.length != 1) {
             System.out.println("wrong arguments");
