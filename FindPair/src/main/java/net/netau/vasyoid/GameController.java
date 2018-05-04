@@ -1,6 +1,7 @@
 package net.netau.vasyoid;
 
 import javafx.util.Pair;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,7 +24,7 @@ public class GameController {
     /**
      * Constructor.
      * Generates random numbers and initialises the game state.
-     * @param boardSize size of the game board.
+     * @param boardSize size of the game board. Assume the size is correct.
      */
     public GameController(int boardSize) {
         shown = new ArrayList<>();
@@ -51,6 +52,7 @@ public class GameController {
      * @param col button's x coordinate.
      * @return how the state changed.
      */
+    @NotNull
     MoveResult handleButton(int row, int col) {
         Pair<Integer, Integer> current = new Pair<>(row, col);
         if (shown.size() == 2) {
@@ -77,6 +79,7 @@ public class GameController {
         return data[row][col];
     }
 
+    @NotNull
     public List<Pair<Integer, Integer>> getShown() {
         return shown;
     }
