@@ -1,10 +1,16 @@
 package net.netau.vasyoid;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+/**
+ * FTP Server proceeds FTP queries.
+ * Two types of queries are supported -- list files in current directory and get a file.
+ */
 public class FtpServer implements AutoCloseable, Runnable {
 
     public static int LIST_QUERY_TYPE = 1;
@@ -17,14 +23,25 @@ public class FtpServer implements AutoCloseable, Runnable {
     private ServerSocket serverSocket;
     private FtpException exception = null;
 
-    public FtpServer(InetAddress addres, int port) throws FtpException {
+    /**
+     * Constructor with specified server address and port.
+     * @param address network connection address to listen
+     * @param port port to listen
+     * @throws FtpException if cannot open a socket
+     */
+    public FtpServer(@NotNull InetAddress address, int port) throws FtpException {
         try {
-            serverSocket = new ServerSocket(port, Integer.MAX_VALUE, addres);
+            serverSocket = new ServerSocket(port, Integer.MAX_VALUE, address);
         } catch (IOException e) {
             throw new FtpException(e);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * Closes the socket.
+     * @throws FtpException if cannot close the socket
+     */
     @Override
     public void close() throws FtpException {
         try {
@@ -41,6 +58,10 @@ public class FtpServer implements AutoCloseable, Runnable {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * Main loop. Accepts incoming connection queries and creates new threads to proceed them.
+     */
     @Override
     public void run() {
         while (true) {
@@ -54,14 +75,21 @@ public class FtpServer implements AutoCloseable, Runnable {
         }
     }
 
+    /**
+     * Worker receives FTP queries and respond to them.
+     */
     private class Worker implements Runnable {
 
         private Socket socket;
 
-        Worker(Socket socket) {
+        public Worker(@NotNull Socket socket) {
             this.socket = socket;
         }
 
+        /**
+         * {@inheritDoc}
+         * Main loop.
+         */
         @Override
         public void run() {
             try (DataInputStream input = new DataInputStream(socket.getInputStream());
@@ -84,13 +112,15 @@ public class FtpServer implements AutoCloseable, Runnable {
                     } else if (queryType == GET_QUERY_TYPE) {
                         File file = new File(input.readUTF());
                         output.writeLong(file.length());
-                        FileInputStream fileInput = new FileInputStream(file);
-                        byte[] buffer = new byte[BUFFER_SIZE];
-                        int readLength;
-                        while ((readLength = fileInput.read(buffer, 0, BUFFER_SIZE)) > 0) {
-                            output.write(buffer, 0, readLength);
+                        if (file.exists()) {
+                            FileInputStream fileInput = new FileInputStream(file);
+                            byte[] buffer = new byte[BUFFER_SIZE];
+                            int readLength;
+                            while ((readLength = fileInput.read(buffer, 0, BUFFER_SIZE)) > 0) {
+                                output.write(buffer, 0, readLength);
+                            }
+                            fileInput.close();
                         }
-                        fileInput.close();
                     }
                 }
             } catch (IOException e) {

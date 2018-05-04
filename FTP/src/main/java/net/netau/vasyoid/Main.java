@@ -1,6 +1,5 @@
 package net.netau.vasyoid;
 
-import java.io.File;
 import java.net.InetAddress;
 import java.util.List;
 
@@ -11,11 +10,11 @@ public class Main {
              FtpClient client = new FtpClient(InetAddress.getLoopbackAddress(), 11111)) {
             Thread serverThread = new Thread(server);
             serverThread.start();
-            List<String> list = client.list("testDir/");
-            for (String fileName : list) {
-                System.out.println(fileName);
+            List<MyFile> list = client.list("testDir/");
+            for (MyFile file : list) {
+                System.out.println(file);
             }
-            System.out.println("success: " + client.get("testDir/file.txt"));
+            System.out.println("success: " + client.get("testDir/lines.mp4"));
         } catch (FtpException e) {
             e.printStackTrace();
         }
