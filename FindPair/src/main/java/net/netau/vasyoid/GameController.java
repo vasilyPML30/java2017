@@ -7,6 +7,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Controller class.
+ * Handles buttons pressed and updates the game state.
+ */
 public class GameController {
 
     private int boardSize;
@@ -16,6 +20,11 @@ public class GameController {
 
     private int[][] data;
 
+    /**
+     * Constructor.
+     * Generates random numbers and initialises the game state.
+     * @param boardSize size of the game board.
+     */
     public GameController(int boardSize) {
         shown = new ArrayList<>();
         this.boardSize = boardSize;
@@ -36,6 +45,12 @@ public class GameController {
         }
     }
 
+    /**
+     * Handles buttons pressed.
+     * @param row button's y coordinate.
+     * @param col button's x coordinate.
+     * @return how the state changed.
+     */
     MoveResult handleButton(int row, int col) {
         Pair<Integer, Integer> current = new Pair<>(row, col);
         if (shown.size() == 2) {
@@ -58,7 +73,7 @@ public class GameController {
         }
     }
 
-    int getValue(int row, int col) {
+    public int getValue(int row, int col) {
         return data[row][col];
     }
 
@@ -70,6 +85,9 @@ public class GameController {
         shown.clear();
     }
 
+    /**
+     * Result of a button press.
+     */
     public enum MoveResult {
         SHOW, HIDE, HIDE_BOTH, WIN, DISABLE, NOTHING
     }

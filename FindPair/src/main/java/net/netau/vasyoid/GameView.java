@@ -13,13 +13,23 @@ import org.jetbrains.annotations.NotNull;
 
 import javafx.util.Duration;
 
+/**
+ * View class.
+ * Displays buttons and handles user interactions.
+ */
 public class GameView extends Application {
 
     private static int boardSize;
     private Button[][] buttons;
     private GameController controller;
 
-    private void flipButton(int row, int col) {
+    /**
+     * Called when a game button is pressed.
+     * Passes the press to the controller and updates buttons' states.
+     * @param row button's y coordinate.
+     * @param col button's x coordinate.
+     */
+    private void fireButton(int row, int col) {
         switch (controller.handleButton(row, col)) {
             case HIDE:
                 buttons[row][col].setText("");
@@ -54,6 +64,10 @@ public class GameView extends Application {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * Sets the buttons.
+     */
     @Override
     public void start(@NotNull Stage primaryStage) {
         controller = new GameController(boardSize);
@@ -70,7 +84,7 @@ public class GameView extends Application {
                 buttons[row][col].setMaxSize(buttonSize, buttonSize);
                 buttons[row][col].setMinSize(buttonSize, buttonSize);
                 int finalRow = row, finalCol = col;
-                buttons[row][col].setOnAction(action -> flipButton(finalRow, finalCol));
+                buttons[row][col].setOnAction(action -> fireButton(finalRow, finalCol));
                 pane.add(buttons[row][col], col, row);
             }
         }
@@ -85,6 +99,11 @@ public class GameView extends Application {
         primaryStage.show();
     }
 
+    /**
+     * Main function.
+     * Parses the command line arguments and launches the application.
+     * @param args the only argument is the board size.
+     */
     public static void main(@NotNull String[] args) {
         if (args.length != 1) {
             System.out.println("usage: FindPair <board size>");
