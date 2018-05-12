@@ -79,6 +79,9 @@ public class FtpClient implements AutoCloseable {
      */
     @NotNull
     public List<MyFile> list(@NotNull String path) throws FtpException {
+        if (path.isEmpty()) {
+            path = ".";
+        }
         sendQuery(FtpServer.LIST_QUERY_TYPE, path);
         try {
             List<MyFile> result = new ArrayList<>();
