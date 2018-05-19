@@ -35,4 +35,5 @@ public interface LightFuture<T> {
      */
     @NotNull
     <E> LightFuture<E> thenApply(@NotNull Function<? super T, E> function);
+
 }

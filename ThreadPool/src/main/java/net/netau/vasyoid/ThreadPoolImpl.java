@@ -68,7 +68,7 @@ public class ThreadPoolImpl {
                     ThreadPoolTask currentTask;
                     synchronized (tasks) {
                         while (tasks.isEmpty()) {
-                                tasks.wait();
+                            tasks.wait();
                         }
                         currentTask = tasks.remove();
                     }
@@ -150,5 +150,7 @@ public class ThreadPoolImpl {
                 }
             });
         }
+
     }
+
 }
