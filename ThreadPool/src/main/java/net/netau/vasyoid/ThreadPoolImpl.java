@@ -13,7 +13,7 @@ import java.util.function.Supplier;
  */
 public class ThreadPoolImpl {
 
-    private Thread[] threads;
+    private final Thread[] threads;
     private final Queue<ThreadPoolTask> tasks = new ArrayDeque<>();
 
     /**
@@ -63,14 +63,14 @@ public class ThreadPoolImpl {
          */
         @Override
         public void run() {
-            ThreadPoolTask currentTask;
             try {
                 while (!Thread.interrupted()) {
+                    ThreadPoolTask currentTask;
                     synchronized (tasks) {
                         while (tasks.isEmpty()) {
                                 tasks.wait();
                         }
-                        currentTask = tasks.poll();
+                        currentTask = tasks.remove();
                     }
                     currentTask.run();
                 }
@@ -80,9 +80,9 @@ public class ThreadPoolImpl {
 
     private class ThreadPoolTask<T> implements LightFuture<T> {
 
-        private boolean ready = false;
+        private Boolean ready = false;
         private LightExecutionException error = null;
-        private Supplier<T> task;
+        private final Supplier<T> task;
         private T result = null;
 
         public ThreadPoolTask(@NotNull Supplier<T> task) {
@@ -94,12 +94,16 @@ public class ThreadPoolImpl {
          */
         @Override
         public boolean isReady() {
-            return ready;
+            synchronized (task) {
+                return ready;
+            }
         }
 
         private synchronized void run() {
-            if (ready) {
-                return;
+            synchronized (task) {
+                if (ready) {
+                    return;
+                }
             }
             try {
                 result = task.get();
@@ -107,7 +111,9 @@ public class ThreadPoolImpl {
                 error = new LightExecutionException("Evaluation failed");
                 error.addSuppressed(e);
             }
-            ready = true;
+            synchronized (task) {
+                ready = true;
+            }
             notifyAll();
         }
 
@@ -135,7 +141,7 @@ public class ThreadPoolImpl {
          */
         @NotNull
         @Override
-        public <E> LightFuture<E> thenApply(@NotNull Function<T, E> function) {
+        public <E> LightFuture<E> thenApply(@NotNull Function<? super T, E> function) {
             return add(() -> {
                 try {
                     return function.apply(get());

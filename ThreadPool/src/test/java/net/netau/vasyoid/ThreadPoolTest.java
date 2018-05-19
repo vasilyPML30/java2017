@@ -3,18 +3,19 @@ package net.netau.vasyoid;
 import org.junit.Test;
 
 import java.util.HashSet;
+import java.util.function.Function;
 
 import static org.junit.Assert.*;
 
 public class ThreadPoolTest {
 
-    @SuppressWarnings({"StatementWithEmptyBody"})
     @Test
     public void shutdownInterruptsAllThreadsTest() throws Exception {
         LightFuture[] tasks = new LightFuture[10];
         ThreadPoolImpl threadPool = new ThreadPoolImpl(tasks.length * 3);
         for (int i = 0; i < tasks.length; i++) {
             tasks[i] = threadPool.add(() -> {
+                //noinspection StatementWithEmptyBody
                 while (!Thread.interrupted());
                 Thread.currentThread().interrupt();
                 return 0;
@@ -26,23 +27,33 @@ public class ThreadPoolTest {
         }
     }
 
-    @SuppressWarnings({"InfiniteLoopStatement", "StatementWithEmptyBody"})
     @Test
     public void thenApplyDoesNotBlockCurrentThreadTest() throws Exception {
         ThreadPoolImpl threadPool = new ThreadPoolImpl(1);
-        threadPool.add(() -> {while (true) {}}).thenApply(x -> 0);
+        threadPool.add(() -> {
+            //noinspection InfiniteLoopStatement, StatementWithEmptyBody
+            while (true) {}
+        }).thenApply(x -> 0);
     }
 
     @Test
     public void isReadyTest() throws Exception {
         ThreadPoolImpl threadPool = new ThreadPoolImpl(1);
+        final Object monitor = new Object();
         LightFuture task = threadPool.add(() -> {
             try {
-                Thread.sleep(1000);
+                synchronized (monitor) {
+                    monitor.wait();
+                }
             } catch (InterruptedException ignored) { }
             return 0;
         });
         assertFalse(task.isReady());
+        while (!task.isReady()) {
+            synchronized (monitor) {
+                monitor.notify();
+            }
+        }
         task.get();
         assertTrue(task.isReady());
     }
@@ -55,7 +66,7 @@ public class ThreadPoolTest {
                 .thenApply(x -> x / 4)
                 .thenApply(x -> x + 1)
                 .thenApply(x -> x * 3);
-        assertEquals((Integer) (33), task.get());
+        assertEquals((Integer) 33, task.get());
     }
 
     @Test
@@ -105,6 +116,14 @@ public class ThreadPoolTest {
             threadIds.add((Long) task.get());
         }
         assertEquals(10, threadIds.size());
+    }
+
+    @Test
+    public void passingGenericParameterInThenApplyTest() throws Exception {
+        ThreadPoolImpl tp = new ThreadPoolImpl(1);
+        LightFuture<Integer> lf = tp.add(() -> 42);
+        Function<Number, String> foo = String::valueOf;
+        lf.thenApply(foo);
     }
 
 }

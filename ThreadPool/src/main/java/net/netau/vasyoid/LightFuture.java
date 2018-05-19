@@ -19,17 +19,20 @@ public interface LightFuture<T> {
 
     /**
      * Task result.
+     * Blocks the current thread until the result is available.
      * @return the result of the computation.
+     * @throws LightExecutionException if an error occurs while computing the result
+     * or the current thread is interrupted.
      */
     @Nullable
     T get() throws LightExecutionException;
 
     /**
      * Applies a function to the result of the task.
-     * @param function function that will bw applied.
+     * @param function function that will be applied.
      * @param <E> function return type.
      * @return a new LightFuture task that represents function application.
      */
     @NotNull
-    <E> LightFuture<E> thenApply(@NotNull Function<T, E> function);
+    <E> LightFuture<E> thenApply(@NotNull Function<? super T, E> function);
 }
