@@ -34,6 +34,6 @@ public interface LightFuture<T> {
      * @return a new LightFuture task that represents function application.
      */
     @NotNull
-    <E> LightFuture<E> thenApply(@NotNull Function<? super T, E> function);
+    <E> LightFuture<E> thenApply(@NotNull Function<? super T, ? extends E> function);
 
 }

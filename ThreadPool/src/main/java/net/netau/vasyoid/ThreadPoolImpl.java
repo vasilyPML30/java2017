@@ -58,9 +58,6 @@ public class ThreadPoolImpl {
 
     private class ThreadPoolWorker implements Runnable {
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void run() {
             try {
@@ -89,9 +86,6 @@ public class ThreadPoolImpl {
             this.task = task;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public boolean isReady() {
             synchronized (task) {
@@ -117,9 +111,6 @@ public class ThreadPoolImpl {
             notifyAll();
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Nullable
         @Override
         public synchronized T get() throws LightExecutionException {
@@ -136,12 +127,9 @@ public class ThreadPoolImpl {
             return result;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @NotNull
         @Override
-        public <E> LightFuture<E> thenApply(@NotNull Function<? super T, E> function) {
+        public <E> LightFuture<E> thenApply(@NotNull Function<? super T, ? extends E> function) {
             return add(() -> {
                 try {
                     return function.apply(get());
