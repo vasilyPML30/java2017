@@ -1,5 +1,7 @@
 package net.netau.vasyoid;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -15,7 +17,7 @@ public class Main {
      * Main application method. Loads a class and executes test methods in it.
      * @param args command line arguments representing a path to a test class and a class name.
      */
-    public static void main(String[] args) {
+    public static void main(@NotNull String[] args) {
         if (args.length != 2) {
             System.out.println("Please enter a path to a test class and a class name.");
             System.exit(1);

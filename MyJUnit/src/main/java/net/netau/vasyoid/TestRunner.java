@@ -24,7 +24,7 @@ public class TestRunner {
     private final Object[] afterMethods;
     private final Object[] testMethods;
 
-    public TestRunner(Class<?> testClass) {
+    public TestRunner(@NotNull Class<?> testClass) {
         this.testClass = testClass;
         beforeClassMethods = getAnnotatedMethods(BeforeClass.class);
         afterClassMethods = getAnnotatedMethods(AfterClass.class);
@@ -33,7 +33,7 @@ public class TestRunner {
         testMethods = getAnnotatedMethods(Test.class);
     }
 
-    private Object[] getAnnotatedMethods(Class annotation) {
+    private @NotNull Object[] getAnnotatedMethods(@NotNull Class annotation) {
         // noinspection unchecked
         return Arrays.stream(testClass.getMethods())
                 .filter(method -> method.getAnnotation(annotation) != null)
@@ -47,7 +47,7 @@ public class TestRunner {
         }
     }
 
-    private List<TestResult> runTests() {
+    private @NotNull List<TestResult> runTests() {
         List<TestResult> results = new LinkedList<>();
         for (Object method : testMethods) {
             Method test = (Method) method;
@@ -97,7 +97,7 @@ public class TestRunner {
      * @throws InstantiationException when could not instantiate a test class.
      * @throws InvocationTargetException when a BeforeClass or AfterClass method thew an exception.
      */
-    public List<TestResult> runAll()
+    public @NotNull List<TestResult> runAll()
             throws IllegalAccessException, InstantiationException, InvocationTargetException {
         testInstance = testClass.newInstance();
         runMethods(beforeClassMethods);
@@ -117,15 +117,15 @@ public class TestRunner {
         private String message = "";
         private long time = 0;
 
-        public String getName() {
+        public @NotNull String getName() {
             return name;
         }
 
-        public TestVerdict getVerdict() {
+        public @NotNull TestVerdict getVerdict() {
             return verdict;
         }
 
-        public String getMessage() {
+        public @NotNull String getMessage() {
             return message;
         }
 
