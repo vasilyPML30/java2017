@@ -6,17 +6,24 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
 
+/**
+ * Console utility that invokes test from a specified class.
+ */
 public class Main {
 
+    /**
+     * Main application method. Loads a class and executes test methods in it.
+     * @param args command line arguments representing a path to a test class and a class name.
+     */
     public static void main(String[] args) {
-        if (args.length != 1) {
-            System.out.println("Please enter a path to a test class.");
+        if (args.length != 2) {
+            System.out.println("Please enter a path to a test class and a class name.");
             System.exit(1);
         } else {
-            File testFile = new File(args[0]);
             try {
+                File testFile = new File(args[0]);
                 ClassLoader classLoader = new URLClassLoader(new URL[]{testFile.toURI().toURL()});
-                Class testClass = classLoader.loadClass(testFile.getName().split("\\.")[0]);
+                Class testClass = Class.forName(args[1], true, classLoader);
                 //noinspection unchecked
                 TestRunner testRunner = new TestRunner(testClass);
                 long startTime = System.currentTimeMillis();

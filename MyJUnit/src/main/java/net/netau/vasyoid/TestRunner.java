@@ -11,6 +11,9 @@ import java.util.List;
 
 import static net.netau.vasyoid.TestRunner.TestResult.TestVerdict.*;
 
+/**
+ * Executes all test methods in a specified class.
+ */
 public class TestRunner {
 
     private final Class<?> testClass;
@@ -62,7 +65,12 @@ public class TestRunner {
                 runMethods(beforeMethods);
                 test.invoke(testInstance);
                 runMethods(afterMethods);
-                testResult.verdict = OK;
+                if (annotation.expected().equals(Test.None.class)) {
+                    testResult.verdict = OK;
+                } else {
+                    testResult.verdict = FAILED;
+                    testResult.message = "Expected exception was not thrown.";
+                }
             } catch (InvocationTargetException e) {
                 Throwable cause = e.getCause();
                 if (annotation.expected().isAssignableFrom(cause.getClass())) {
@@ -82,6 +90,13 @@ public class TestRunner {
         return results;
     }
 
+    /**
+     * Invokes all test in the class.
+     * @return List of testResults objects representing a results of each test.
+     * @throws IllegalAccessException when could not access some private/protected methods.
+     * @throws InstantiationException when could not instantiate a test class.
+     * @throws InvocationTargetException when a BeforeClass or AfterClass method thew an exception.
+     */
     public List<TestResult> runAll()
             throws IllegalAccessException, InstantiationException, InvocationTargetException {
         testInstance = testClass.newInstance();
@@ -91,6 +106,10 @@ public class TestRunner {
         return result;
     }
 
+    /**
+     * Class representing test results.
+     * Contains a name of a test method, a verdict, a message and an execution time.
+     */
     public static class TestResult {
 
         private String name;
