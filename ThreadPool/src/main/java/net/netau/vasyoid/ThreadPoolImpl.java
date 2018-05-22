@@ -87,17 +87,13 @@ public class ThreadPoolImpl {
         }
 
         @Override
-        public boolean isReady() {
-            synchronized (task) {
-                return ready;
-            }
+        public synchronized boolean isReady() {
+            return ready;
         }
 
         private synchronized void run() {
-            synchronized (task) {
-                if (ready) {
-                    return;
-                }
+            if (ready) {
+                return;
             }
             try {
                 result = task.get();
@@ -105,9 +101,7 @@ public class ThreadPoolImpl {
                 error = new LightExecutionException("Evaluation failed");
                 error.addSuppressed(e);
             }
-            synchronized (task) {
-                ready = true;
-            }
+            ready = true;
             notifyAll();
         }
 

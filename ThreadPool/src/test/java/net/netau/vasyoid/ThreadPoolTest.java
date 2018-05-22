@@ -39,19 +39,22 @@ public class ThreadPoolTest {
     @Test
     public void isReadyTest() throws Exception {
         ThreadPoolImpl threadPool = new ThreadPoolImpl(1);
-        final Object monitor = new Object();
+        final MyMonitor monitor = new MyMonitor();
         LightFuture task = threadPool.add(() -> {
             try {
                 synchronized (monitor) {
+                    monitor.isWaited = true;
                     monitor.wait();
                 }
             } catch (InterruptedException ignored) { }
             return 0;
         });
-        assertFalse(task.isReady());
-        while (!task.isReady()) {
+        while (true) {
             synchronized (monitor) {
-                monitor.notify();
+                if (monitor.isWaited) {
+                    monitor.notify();
+                    break;
+                }
             }
         }
         task.get();
@@ -124,6 +127,10 @@ public class ThreadPoolTest {
         LightFuture<Integer> lf = tp.add(() -> 42);
         Function<Number, String> foo = String::valueOf;
         lf.thenApply(foo);
+    }
+
+    private static class MyMonitor {
+        private boolean isWaited = false;
     }
 
 }
