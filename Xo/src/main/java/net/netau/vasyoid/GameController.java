@@ -1,7 +1,6 @@
 package net.netau.vasyoid;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Base game controller class.
@@ -9,9 +8,9 @@ import org.jetbrains.annotations.Nullable;
  */
 public class GameController {
 
-    public static int BOARD_SIZE = 3;
+    public final static int BOARD_SIZE = 3;
 
-    protected CellState[][] board = new CellState[3][3];
+    protected final CellState[][] board = new CellState[3][3];
     protected GameState currentGameState = GameState.CROSSES_MOVE;
     private boolean gameOver;
 

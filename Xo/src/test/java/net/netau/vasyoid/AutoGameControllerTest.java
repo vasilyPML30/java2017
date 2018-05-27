@@ -14,7 +14,7 @@ import static org.junit.Assert.*;
 
 public class AutoGameControllerTest {
 
-    private GameController.CellState[][] board = new GameController.CellState[3][3];
+    private final GameController.CellState[][] board = new GameController.CellState[3][3];
     private MyView view = mock(MyView.class);
     private AutoGameController controllerEasy, controllerHard;
 

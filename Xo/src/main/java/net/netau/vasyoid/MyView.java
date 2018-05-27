@@ -25,12 +25,12 @@ public class MyView extends Application {
     private static final int MAX_NAME_LENGTH = 10;
 
     private GameController controller;
-    private Button[][] buttons = new Button[BOARD_SIZE][BOARD_SIZE];
-    private Label titleText = new Label();
+    private final Button[][] buttons = new Button[BOARD_SIZE][BOARD_SIZE];
+    private final Label titleText = new Label();
     private GameController.CellState firstPlayerItem = GameController.CellState.CROSS;
     private String firstName = "Алиса";
     private String secondName = "Боб";
-    private TableView<GameResult> table = new TableView<>();
+    private final TableView<GameResult> table = new TableView<>();
 
     /**
      * Simulate a click on one of the board buttons.
@@ -198,7 +198,6 @@ public class MyView extends Application {
     private Tab createScoreTab() {
         Tab scoreTab = new Tab();
         scoreTab.setText("Результаты игр");
-        table = new TableView<>();
         TableColumn<GameResult, String> firstPlayer = new TableColumn<>("Первый игрок");
         firstPlayer.setCellValueFactory(new PropertyValueFactory<>("firstPlayerName"));
         TableColumn<GameResult, String> secondPlayer = new TableColumn<>("Второй игрок");

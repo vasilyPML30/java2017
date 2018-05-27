@@ -13,13 +13,15 @@ import java.util.*;
 public class AutoGameController extends GameController {
 
     private final Level currentLevel;
-    private Random randomGenerator = new Random();
+    private final Random randomGenerator = new Random();
     private GameState autoState;
-    private List<Integer> freeCells = new LinkedList<>();
-    private MyView view;
-    private Map<Integer, BoardState> isWinningPosition  = new HashMap<>();
+    private final List<Integer> freeCells = new LinkedList<>();
+    private final MyView view;
+    private final Map<Integer, BoardState> isWinningPosition  = new HashMap<>();
 
-    AutoGameController(@NotNull MyView view, @NotNull Level currentLevel, @NotNull CellState autoUnit) {
+    public AutoGameController(@NotNull MyView view,
+                              @NotNull Level currentLevel,
+                              @NotNull CellState autoUnit) {
         this.view = view;
         this.currentLevel = currentLevel;
         this.autoState = autoUnit.equals(CellState.CROSS) ?
