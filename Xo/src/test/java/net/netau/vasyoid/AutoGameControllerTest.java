@@ -19,8 +19,8 @@ public class AutoGameControllerTest {
     private AutoGameController controllerEasy, controllerHard;
 
     private void initializeControllers() {
-        controllerHard = new AutoGameController(view, HARD, CROSS);
-        controllerEasy = new AutoGameController(view, EASY, NOUGHT);
+        controllerHard = new HardGameController(view, CROSS);
+        controllerEasy = new EasyGameController(view, NOUGHT);
         controllerHard.init();
         controllerEasy.init();
         for (int i = 0; i < 3; i++) {
@@ -94,7 +94,7 @@ public class AutoGameControllerTest {
             assertEquals(CROSSES_WIN, controllerHard.getCurrentGameState());
             return null;
         }).when(view).pressButton(any(Integer.class), any(Integer.class));
-        controllerHard = new AutoGameController(view, HARD, CROSS);
+        controllerHard = new HardGameController(view, CROSS);
         controllerHard.init();
         controllerHard.move(0, 0);
         controllerHard.move(0, 1);

@@ -172,13 +172,11 @@ public class MyView extends Application {
                     break;
                 case EASY_BOT:
                     secondPlayerName.setText(t1.toString());
-                    controller = new AutoGameController(this, AutoGameController.Level.EASY,
-                            firstPlayerItem.getOpposite());
+                    controller = new EasyGameController(this, firstPlayerItem.getOpposite());
                     break;
                 default:
                     secondPlayerName.setText(t1.toString());
-                    controller = new AutoGameController(this, AutoGameController.Level.HARD,
-                            firstPlayerItem.getOpposite());
+                    controller = new HardGameController(this, firstPlayerItem.getOpposite());
                     break;
             }
             restart();
@@ -271,7 +269,7 @@ public class MyView extends Application {
     }
 
     /**
-     * Types of states the game can have.
+     * Types of players.
      */
     private enum PlayerType {
         USER("Пользователь"),

@@ -10,20 +10,16 @@ import java.util.*;
  * Simulates a user play.
  * Has two difficulty levels.
  */
-public class AutoGameController extends GameController {
+public abstract class AutoGameController extends GameController {
 
-    private final Level currentLevel;
-    private final Random randomGenerator = new Random();
+    protected final Random randomGenerator = new Random();
     private GameState autoState;
-    private final List<Integer> freeCells = new LinkedList<>();
-    private final MyView view;
-    private final Map<Integer, BoardState> isWinningPosition  = new HashMap<>();
+    protected final List<Integer> freeCells = new LinkedList<>();
+    protected final MyView view;
+    protected final Map<Integer, BoardState> isWinningPosition  = new HashMap<>();
 
-    public AutoGameController(@NotNull MyView view,
-                              @NotNull Level currentLevel,
-                              @NotNull CellState autoUnit) {
+    public AutoGameController(@NotNull MyView view, @NotNull CellState autoUnit) {
         this.view = view;
-        this.currentLevel = currentLevel;
         this.autoState = autoUnit.equals(CellState.CROSS) ?
                 GameState.CROSSES_MOVE : GameState.NOUGHTS_MOVE;
     }
@@ -46,7 +42,7 @@ public class AutoGameController extends GameController {
         calculateMoves(board);
     }
 
-    private int boardToMask(@NotNull CellState[][] board) {
+    protected int boardToMask(@NotNull CellState[][] board) {
         int mask = 0;
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
@@ -57,7 +53,7 @@ public class AutoGameController extends GameController {
     }
 
     @NotNull
-    private CellState[][] maskToBoard(int mask) {
+    protected CellState[][] maskToBoard(int mask) {
         CellState[][] board = new CellState[BOARD_SIZE][BOARD_SIZE];
         for (int i = BOARD_SIZE - 1; i >= 0; i--) {
             for (int j = BOARD_SIZE - 1; j >= 0; j--) {
@@ -69,7 +65,7 @@ public class AutoGameController extends GameController {
     }
 
     @NotNull
-    private CellState whoMovesNext(@NotNull CellState[][] board) {
+    protected CellState whoMovesNext(@NotNull CellState[][] board) {
         int crosses = 0, noughts = 0;
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
@@ -90,7 +86,7 @@ public class AutoGameController extends GameController {
         }
     }
 
-    private void calculateMoves(@NotNull CellState[][] board) {
+    protected void calculateMoves(@NotNull CellState[][] board) {
         int mask = boardToMask(board);
         if (isWinningPosition.containsKey(mask)) {
             return;
@@ -131,35 +127,7 @@ public class AutoGameController extends GameController {
         }
     }
 
-    private void autoMove() {
-        if (currentLevel.equals(Level.EASY)) {
-            int position = randomGenerator.nextInt(freeCells.size());
-            int cellId = freeCells.get(position);
-            view.pressButton(cellId / BOARD_SIZE, cellId % BOARD_SIZE);
-        } else {
-            int curMask = boardToMask(board);
-            curMask = boardToMask(maskToBoard(curMask));
-            calculateMoves(maskToBoard(curMask));
-            BoardState curLabel = isWinningPosition.get(curMask);
-            if (curLabel.equals(BoardState.LOSE)) {
-                int cellId = freeCells.get(freeCells.get(0));
-                view.pressButton(cellId / BOARD_SIZE, cellId % BOARD_SIZE);
-            } else {
-                for (int cellId : freeCells) {
-                    board[cellId / BOARD_SIZE][cellId % BOARD_SIZE] = whoMovesNext(board);
-                    BoardState nextLabel = isWinningPosition
-                            .getOrDefault(boardToMask(board), BoardState.WIN);
-                    if ((curLabel.equals(BoardState.DRAW) && nextLabel.equals(BoardState.DRAW)) ||
-                            (curLabel.equals(BoardState.WIN) && nextLabel.equals(BoardState.LOSE))) {
-                        board[cellId / BOARD_SIZE][cellId % BOARD_SIZE] = CellState.EMPTY;
-                        view.pressButton(cellId / BOARD_SIZE, cellId % BOARD_SIZE);
-                        return;
-                    }
-                    board[cellId / BOARD_SIZE][cellId % BOARD_SIZE] = CellState.EMPTY;
-                }
-            }
-        }
-    }
+    protected abstract void autoMove();
 
     /**
      * {@inheritDoc}
