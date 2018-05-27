@@ -13,14 +13,14 @@ import java.net.Socket;
  */
 public class FtpServer implements AutoCloseable, Runnable {
 
-    public static int LIST_QUERY_TYPE = 1;
-    public static int GET_QUERY_TYPE = 2;
-    public static int STOP_QUERY_TYPE = 3;
+    public final static int LIST_QUERY_TYPE = 1;
+    public final static int GET_QUERY_TYPE = 2;
+    public final static int STOP_QUERY_TYPE = 3;
 
-    private static int BUFFER_SIZE = 1024;
+    private final static int BUFFER_SIZE = 1024;
 
 
-    private ServerSocket serverSocket;
+    private final ServerSocket serverSocket;
     private FtpException exception = null;
 
     /**

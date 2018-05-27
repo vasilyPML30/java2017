@@ -15,11 +15,11 @@ import java.util.List;
  */
 public class FtpClient implements AutoCloseable {
 
-    private static int BUFFER_SIZE = 1024;
+    private final static int BUFFER_SIZE = 1024;
 
-    private Socket socket;
-    private DataInputStream input;
-    private DataOutputStream output;
+    private final Socket socket;
+    private final DataInputStream input;
+    private final DataOutputStream output;
 
     /**
      * Constructor with specified server address and port.

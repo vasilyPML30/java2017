@@ -26,9 +26,9 @@ import java.util.stream.Collectors;
 public class FtpView extends Application {
 
     @SuppressWarnings("FieldCanBeLocal")
-    private static int MIN_WINDOW_WIDTH = 300;
+    private final static int MIN_WINDOW_WIDTH = 300;
     @SuppressWarnings("FieldCanBeLocal")
-    private static int MIN_WINDOW_HEIGHT = 400;
+    private final static int MIN_WINDOW_HEIGHT = 400;
 
     private static FtpClient client;
     private static File currentDirectory = new File("/");

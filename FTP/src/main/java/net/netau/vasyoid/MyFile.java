@@ -8,8 +8,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public class MyFile {
 
-    private String name;
-    private boolean isDirectory;
+    private final String name;
+    private final boolean isDirectory;
 
     public MyFile(@NotNull String name, boolean isDirectory) {
         this.name = name;
