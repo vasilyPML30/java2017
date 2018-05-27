@@ -86,7 +86,8 @@ public class FtpServer implements AutoCloseable, Runnable {
             this.socket = socket;
         }
 
-        private void list(DataInputStream input, DataOutputStream output) throws IOException {
+        private void list(@NotNull DataInputStream input,
+                          @NotNull DataOutputStream output) throws IOException {
             File directory = new File(input.readUTF());
             File[] files = directory.listFiles();
             output.writeInt(files == null ? 0 : files.length);
@@ -99,7 +100,8 @@ public class FtpServer implements AutoCloseable, Runnable {
             output.flush();
         }
 
-        private void get(DataInputStream input, DataOutputStream output) throws IOException {
+        private void get(@NotNull DataInputStream input,
+                         @NotNull DataOutputStream output) throws IOException {
             File file = new File(input.readUTF());
             output.writeLong(file.length());
             if (file.exists()) {
