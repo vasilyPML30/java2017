@@ -93,20 +93,19 @@ public class GameController {
      * @return new state of the specified cell.
      */
     public CellState move(int row, int col) {
-        if (board[row][col] != CellState.EMPTY) {
-            return board[row][col];
-        }
-        switch (currentGameState) {
-            case CROSSES_MOVE:
-                board[row][col] = CellState.CROSS;
-                updateGameState();
-                break;
-            case NOUGHTS_MOVE:
-                board[row][col] = CellState.NOUGHT;
-                updateGameState();
-                break;
-            default:
-                break;
+        if (board[row][col] == CellState.EMPTY) {
+            switch (currentGameState) {
+                case CROSSES_MOVE:
+                    board[row][col] = CellState.CROSS;
+                    updateGameState();
+                    break;
+                case NOUGHTS_MOVE:
+                    board[row][col] = CellState.NOUGHT;
+                    updateGameState();
+                    break;
+                default:
+                    break;
+            }
         }
         return board[row][col];
     }
@@ -167,16 +166,7 @@ public class GameController {
 
         @NotNull
         public static CellState parseValue(int value) {
-            switch (value) {
-                case 0:
-                    return EMPTY;
-                case 1:
-                    return CROSS;
-                case 2:
-                    return NOUGHT;
-                default:
-                    throw new IllegalArgumentException();
-            }
+            return values()[value];
         }
 
         @NotNull

@@ -121,7 +121,7 @@ public class GameControllerTest {
         assertEquals(2, NOUGHT.getValue());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
     public void testCellStateParseValue() throws Exception {
         assertEquals(EMPTY, GameController.CellState.parseValue(0));
         assertEquals(CROSS, GameController.CellState.parseValue(1));

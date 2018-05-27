@@ -158,25 +158,25 @@ public class MyView extends Application {
             }
             updateTitle();
         });
-        ComboBox<String> secondPlayer = new ComboBox<>();
-        secondPlayer.getItems().addAll("Пользователь", "Изи робот", "Хард робот");
+        ComboBox<PlayerType> secondPlayer = new ComboBox<>();
+        secondPlayer.getItems().addAll(PlayerType.values());
         secondPlayer.getSelectionModel().selectFirst();
         secondPlayer.setMaxWidth(Double.MAX_VALUE);
         secondPlayer.valueProperty().addListener((observableValue, s, t1) -> {
-            secondPlayerName.setVisible(t1.equals("Пользователь"));
-            secondPlayerNameLabel.setVisible(t1.equals("Пользователь"));
+            secondPlayerName.setVisible(t1.equals(PlayerType.USER));
+            secondPlayerNameLabel.setVisible(t1.equals(PlayerType.USER));
             switch (t1) {
-                case "Пользователь":
+                case USER:
                     secondPlayerName.setText("");
                     controller = new GameController();
                     break;
-                case "Изи робот":
-                    secondPlayerName.setText(t1);
+                case EASY_BOT:
+                    secondPlayerName.setText(t1.toString());
                     controller = new AutoGameController(this, AutoGameController.Level.EASY,
                             firstPlayerItem.getOpposite());
                     break;
                 default:
-                    secondPlayerName.setText(t1);
+                    secondPlayerName.setText(t1.toString());
                     controller = new AutoGameController(this, AutoGameController.Level.HARD,
                             firstPlayerItem.getOpposite());
                     break;
@@ -267,6 +267,27 @@ public class MyView extends Application {
         @SuppressWarnings("unused")
         public String getResult() {
             return result.get();
+        }
+    }
+
+    /**
+     * Types of states the game can have.
+     */
+    private enum PlayerType {
+        USER("Пользователь"),
+        EASY_BOT("Изи робот"),
+        HARD_BOT("Хард робот");
+
+        private String text;
+
+        PlayerType(@NotNull String text) {
+            this.text = text;
+        }
+
+        @NotNull
+        @Override
+        public String toString() {
+            return text;
         }
     }
 }
