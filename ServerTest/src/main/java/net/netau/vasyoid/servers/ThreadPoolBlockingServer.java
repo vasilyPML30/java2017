@@ -1,10 +1,12 @@
-package net.netau.vasyoid;
+package net.netau.vasyoid.servers;
+
+import net.netau.vasyoid.Protocol;
+import net.netau.vasyoid.Utils;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 public class ThreadPoolBlockingServer extends BlockingServer {
 
@@ -18,13 +20,13 @@ public class ThreadPoolBlockingServer extends BlockingServer {
             serverSocket = new ServerSocket(BLOCKING_THREAD_POOL_SERVER_PORT,
                     Integer.MAX_VALUE, ADDRESS);
         } catch (IOException e) {
-            System.out.println("Could not create a socket: " + e.getMessage());
+            System.out.println("Could not create a server socket: " + e.getMessage());
         }
     }
 
     @Override
-    protected void proceed(Socket socket) {
-        Worker worker = new Worker(socket);
+    protected void proceed(Socket socket, int requestsCount) {
+        Worker worker = new Worker(socket, requestsCount);
         worker.start();
     }
 
@@ -32,29 +34,34 @@ public class ThreadPoolBlockingServer extends BlockingServer {
 
         private final Socket socket;
         private final ExecutorService responser = Executors.newSingleThreadExecutor();
+        private final int requeststCount;
 
-        Worker(Socket socket) {
+        Worker(Socket socket, int requestsCount) {
             this.socket = socket;
+            this.requeststCount = requestsCount;
         }
 
         @Override
         public void run() {
             try (DataInputStream input = new DataInputStream(socket.getInputStream());
                  DataOutputStream output = new DataOutputStream(socket.getOutputStream())) {
-                //noinspection InfiniteLoopStatement
-                while (true) {
-                    Request.Array array = readMessage(input);
+                for (int i = 0; i < requeststCount; ++i) {
+                    Protocol.Array array = Utils.readArray(input);
+                    long startTime = System.currentTimeMillis();
                     threadPool.submit(() -> {
-                        Request.Array result = sort(array);
+                        Protocol.Array result = Utils.sort(array, testResult);
                         responser.submit(() -> {
+                            testResult.addHandleTime(
+                                    (int) (System.currentTimeMillis() - startTime));
                             try {
-                                writeMessage(result, output);
+                                Utils.writeMessage(result, output);
                             } catch (IOException e) {
-                                System.out.println("Could not write a response: " + e.getMessage());
+                                System.out.println("Could not write a response: "
+                                        + e.getMessage());
                             }
                         });
-
                     });
+                    completedRequests.countDown();
                 }
             } catch (IOException e) {
                 System.out.println("Could not communicate with a client: " + e.getMessage());

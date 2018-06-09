@@ -1,6 +1,8 @@
-package net.netau.vasyoid;
+package net.netau.vasyoid.servers;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import net.netau.vasyoid.Protocol;
+import net.netau.vasyoid.Utils;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -8,17 +10,15 @@ import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.locks.Lock;
 
 public class NonBlockingServer extends Server {
 
     private static final int THREAD_POOL_SIZE = 4;
 
     private ServerSocketChannel acceptor;
-    private final Object readMutex = new Object();
-    private final Object writeMutex = new Object();
     private Selector readSelector;
     private Selector writeSelector;
     private final ExecutorService threadPool;
@@ -36,71 +36,83 @@ public class NonBlockingServer extends Server {
     }
 
     @Override
-    public void run() {
+    public TestResult run(int clientsCount, int requestsCount) {
+        completedRequests = new CountDownLatch(clientsCount * requestsCount);
         ReadWorker readWorker = new ReadWorker();
         WriteWorker writeWorker = new WriteWorker();
         readWorker.start();
         writeWorker.start();
         try {
-            //noinspection InfiniteLoopStatement
-            while (true) {
+            for (int i = 0; i < clientsCount; ++i) {
                 SocketChannel channel = acceptor.accept();
                 channel.configureBlocking(false);
                 //noinspection SynchronizeOnNonFinalField
-                //synchronized (readMutex) {
+                synchronized (readSelector) {
                     channel.register(readSelector, SelectionKey.OP_READ, new Client());
-                //}
+                }
             }
         } catch (IOException e) {
             System.out.println("Could not create a socket channel: " + e.getMessage());
         }
+        try {
+            completedRequests.await();
+            readWorker.interrupt();
+            writeWorker.interrupt();
+            readWorker.join();
+            writeWorker.join();
+        } catch (InterruptedException ignored) { }
+        return testResult;
     }
 
     private class ReadWorker extends Thread {
 
         @Override
         public void run() {
-            //noinspection InfiniteLoopStatement
-                try {
-                    while (true) {
-                        //noinspection SynchronizeOnNonFinalField
-                        synchronized (readMutex) {
-                            if (readSelector.selectNow() == 0) {
+            try {
+                while (!isInterrupted()) {
+                    //noinspection SynchronizeOnNonFinalField
+                    synchronized (readSelector) {
+                        if (readSelector.selectNow() == 0) {
+                            continue;
+                        }
+                        Set<SelectionKey> readyChannelsKeys = readSelector.selectedKeys();
+                        Iterator<SelectionKey> keyIterator = readyChannelsKeys.iterator();
+                        while (keyIterator.hasNext()) {
+                            SelectionKey key = keyIterator.next();
+                            keyIterator.remove();
+                            Client client = (Client) key.attachment();
+                            SocketChannel channel = (SocketChannel) key.channel();
+                            if (!channel.isOpen()) {
+                                key.cancel();
                                 continue;
                             }
-                            Set<SelectionKey> readyChannelsKeys = readSelector.selectedKeys();
-                            Iterator<SelectionKey> keyIterator = readyChannelsKeys.iterator();
-                            while (keyIterator.hasNext()) {
-                                SelectionKey key = keyIterator.next();
-                                keyIterator.remove();
-                                Client client = (Client) key.attachment();
-                                SocketChannel channel = (SocketChannel) key.channel();
-                                if (!channel.isOpen()) {
-                                    key.cancel();
-                                    continue;
-                                }
-                                if (!client.read(channel)) {
-                                    continue;
-                                }
-                                key.cancel();
-                                threadPool.submit(() -> {
-                                    client.prepareResponse(sort(client.array));
-                                    try {
-                                        //noinspection SynchronizeOnNonFinalField
-                                        synchronized (writeMutex) {
-                                            channel.register(writeSelector, SelectionKey.OP_WRITE, client);
-                                        }
-                                    } catch (ClosedChannelException e) {
-                                        System.out.println("Could not register a channel: " + e.getMessage());
-                                    }
-                                });
+                            if (!client.read(channel)) {
+                                continue;
                             }
-                            readyChannelsKeys.clear();
+                            key.cancel();
+                            long startTime = System.currentTimeMillis();
+                            threadPool.submit(() -> {
+                                client.prepareResponse(Utils.sort(client.array, testResult));
+                                testResult.addHandleTime(
+                                        (int) (System.currentTimeMillis() - startTime));
+                                try {
+                                    //noinspection SynchronizeOnNonFinalField
+                                    synchronized (writeSelector) {
+                                        channel.register(writeSelector,
+                                                SelectionKey.OP_WRITE, client);
+                                    }
+                                } catch (ClosedChannelException e) {
+                                    System.out.println("Could not register a channel: "
+                                            + e.getMessage());
+                                }
+                            });
                         }
+                        readyChannelsKeys.clear();
                     }
-                } catch (IOException e) {
-                    System.out.println("Error working with channels: " + e.getMessage());
                 }
+            } catch (IOException e) {
+                System.out.println("Error working with channels: " + e.getMessage());
+            }
         }
     }
 
@@ -108,11 +120,10 @@ public class NonBlockingServer extends Server {
 
         @Override
         public void run() {
-            //noinspection InfiniteLoopStatement
-            while (true) {
+            while (!isInterrupted()) {
                 try {
                     //noinspection SynchronizeOnNonFinalField
-                    synchronized (writeMutex) {
+                    synchronized (writeSelector) {
                         if (writeSelector.selectNow() == 0) {
                             continue;
                         }
@@ -126,9 +137,10 @@ public class NonBlockingServer extends Server {
                             if (!client.write(channel)) {
                                 continue;
                             }
+                            completedRequests.countDown();
                             key.cancel();
                             //noinspection SynchronizeOnNonFinalField
-                            synchronized (readMutex) {
+                            synchronized (readSelector) {
                                 channel.register(readSelector, SelectionKey.OP_READ, client);
                             }
                         }
@@ -143,7 +155,7 @@ public class NonBlockingServer extends Server {
     private static class Client {
 
         private ByteBuffer serializedData = null;
-        private Request.Array array = null;
+        private Protocol.Array array = null;
 
         public void readSize(SocketChannel channel) {
             ByteBuffer size = ByteBuffer.allocate(4);
@@ -180,7 +192,7 @@ public class NonBlockingServer extends Server {
             }
         }
 
-        public void prepareResponse(Request.Array array) {
+        public void prepareResponse(Protocol.Array array) {
             this.array = array;
             serializedData = ByteBuffer.allocate(array.getSerializedSize());
             serializedData.put(array.toByteArray());
@@ -200,7 +212,7 @@ public class NonBlockingServer extends Server {
             if (serializedData.remaining() == 0) {
                 serializedData.flip();
                 try {
-                    array = Request.Array.parseFrom(serializedData.array());
+                    array = Protocol.Array.parseFrom(serializedData.array());
                     serializedData.clear();
                 } catch (InvalidProtocolBufferException e) {
                     System.out.println("Invalid protocol buffer: " + e.getMessage());
