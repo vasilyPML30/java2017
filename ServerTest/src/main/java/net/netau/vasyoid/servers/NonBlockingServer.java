@@ -1,8 +1,8 @@
 package net.netau.vasyoid.servers;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import net.netau.vasyoid.Protocol;
-import net.netau.vasyoid.Utils;
+import net.netau.vasyoid.utils.Protocol;
+import net.netau.vasyoid.utils.Utils;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -27,7 +27,7 @@ public class NonBlockingServer extends Server {
         threadPool = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
         try {
             acceptor = ServerSocketChannel.open();
-            acceptor.bind(new InetSocketAddress(NON_BLOCKING_SERVER_PORT));
+            acceptor.bind(new InetSocketAddress(ServerType.NON_BLOCKING.getPort()));
             readSelector = Selector.open();
             writeSelector = Selector.open();
         } catch (IOException e) {
@@ -37,6 +37,7 @@ public class NonBlockingServer extends Server {
 
     @Override
     public TestResult run(int clientsCount, int requestsCount) {
+        testResult = new TestResult();
         completedRequests = new CountDownLatch(clientsCount * requestsCount);
         ReadWorker readWorker = new ReadWorker();
         WriteWorker writeWorker = new WriteWorker();
@@ -60,6 +61,7 @@ public class NonBlockingServer extends Server {
             writeWorker.interrupt();
             readWorker.join();
             writeWorker.join();
+            threadPool.shutdown();
         } catch (InterruptedException ignored) { }
         return testResult;
     }
@@ -90,6 +92,7 @@ public class NonBlockingServer extends Server {
                                 continue;
                             }
                             key.cancel();
+                            testResult.addTest();
                             long startTime = System.currentTimeMillis();
                             threadPool.submit(() -> {
                                 client.prepareResponse(Utils.sort(client.array, testResult));

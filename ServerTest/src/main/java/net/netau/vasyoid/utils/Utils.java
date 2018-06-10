@@ -1,4 +1,4 @@
-package net.netau.vasyoid;
+package net.netau.vasyoid.utils;
 
 import com.google.protobuf.GeneratedMessageV3;
 import net.netau.vasyoid.servers.Server;
@@ -29,25 +29,38 @@ public class Utils {
 
     private static byte[] readMessage(DataInputStream input) throws IOException {
         int messageSize = input.readInt();
+        if (messageSize < 0) {
+            return null;
+        }
         byte[] data = new byte[messageSize];
-        //noinspection ResultOfMethodCallIgnored
-        input.read(data);
+        int totalRead = 0;
+        while (totalRead < messageSize) {
+            totalRead += input.read(data, totalRead, messageSize - totalRead);
+        }
         return data;
     }
 
     public static Protocol.Array readArray(DataInputStream input) throws IOException {
-        return Protocol.Array.parseFrom(readMessage(input));
+        byte[] data = readMessage(input);
+        if (data == null) {
+            return null;
+        }
+        return Protocol.Array.parseFrom(data);
     }
 
     public static Protocol.TestTask readTestTask(DataInputStream input) throws IOException {
-        return Protocol.TestTask.parseFrom(readMessage(input));
+        byte[] data = readMessage(input);
+        if (data == null) {
+            return null;
+        }
+        return Protocol.TestTask.parseFrom(data);
     }
 
-    public static void writeMessage(GeneratedMessageV3 array, DataOutputStream output)
+    public static void writeMessage(GeneratedMessageV3 message, DataOutputStream output)
             throws IOException {
-        output.writeInt(array.getSerializedSize());
+        output.writeInt(message.getSerializedSize());
         //noinspection ResultOfMethodCallIgnored
-        output.write(array.toByteArray());
+        output.write(message.toByteArray());
         output.flush();
     }
 }

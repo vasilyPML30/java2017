@@ -1,7 +1,7 @@
 package net.netau.vasyoid.servers;
 
-import net.netau.vasyoid.Protocol;
-import net.netau.vasyoid.Utils;
+import net.netau.vasyoid.utils.Protocol;
+import net.netau.vasyoid.utils.Utils;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -17,7 +17,7 @@ public class ThreadPoolBlockingServer extends BlockingServer {
     public ThreadPoolBlockingServer() {
         threadPool = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
         try {
-            serverSocket = new ServerSocket(BLOCKING_THREAD_POOL_SERVER_PORT,
+            serverSocket = new ServerSocket(ServerType.THREAD_POOL.getPort(),
                     Integer.MAX_VALUE, ADDRESS);
         } catch (IOException e) {
             System.out.println("Could not create a server socket: " + e.getMessage());
@@ -25,8 +25,15 @@ public class ThreadPoolBlockingServer extends BlockingServer {
     }
 
     @Override
-    protected void proceed(Socket socket, int requestsCount) {
-        Worker worker = new Worker(socket, requestsCount);
+    public TestResult run(int clientsCount, int requestsCount) {
+        TestResult result = super.run(clientsCount, requestsCount);
+        threadPool.shutdown();
+        return result;
+    }
+
+    @Override
+    protected void proceed(Socket socket) {
+        Worker worker = new Worker(socket);
         worker.start();
     }
 
@@ -34,19 +41,21 @@ public class ThreadPoolBlockingServer extends BlockingServer {
 
         private final Socket socket;
         private final ExecutorService responser = Executors.newSingleThreadExecutor();
-        private final int requeststCount;
 
-        Worker(Socket socket, int requestsCount) {
+        Worker(Socket socket) {
             this.socket = socket;
-            this.requeststCount = requestsCount;
         }
 
         @Override
         public void run() {
             try (DataInputStream input = new DataInputStream(socket.getInputStream());
                  DataOutputStream output = new DataOutputStream(socket.getOutputStream())) {
-                for (int i = 0; i < requeststCount; ++i) {
+                while (true) {
                     Protocol.Array array = Utils.readArray(input);
+                    if (array == null) {
+                        break;
+                    }
+                    testResult.addTest();
                     long startTime = System.currentTimeMillis();
                     threadPool.submit(() -> {
                         Protocol.Array result = Utils.sort(array, testResult);

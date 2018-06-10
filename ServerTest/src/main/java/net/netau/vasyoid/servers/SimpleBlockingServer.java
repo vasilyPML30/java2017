@@ -1,7 +1,7 @@
 package net.netau.vasyoid.servers;
 
-import net.netau.vasyoid.Protocol;
-import net.netau.vasyoid.Utils;
+import net.netau.vasyoid.utils.Protocol;
+import net.netau.vasyoid.utils.Utils;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -11,15 +11,16 @@ public class SimpleBlockingServer extends BlockingServer {
 
     public SimpleBlockingServer() {
         try {
-            serverSocket = new ServerSocket(SIMPLE_BLOCKING_SERVER_PORT, Integer.MAX_VALUE, ADDRESS);
+            serverSocket = new ServerSocket(ServerType.SIMPLE.getPort(),
+                    Integer.MAX_VALUE, ADDRESS);
         } catch (IOException e) {
             System.out.println("Could not create a server socket: " + e.getMessage());
         }
     }
 
     @Override
-    protected void proceed(Socket socket, int requestsCount) {
-        Worker worker = new Worker(socket, requestsCount);
+    protected void proceed(Socket socket) {
+        Worker worker = new Worker(socket);
         Thread workerThread = new Thread(worker);
         workerThread.start();
     }
@@ -27,19 +28,21 @@ public class SimpleBlockingServer extends BlockingServer {
     private class Worker implements Runnable {
 
         private Socket socket;
-        private final int requestsCount;
 
-        Worker(Socket socket, int requestsCount) {
+        Worker(Socket socket) {
             this.socket = socket;
-            this.requestsCount = requestsCount;
         }
 
         @Override
         public void run() {
             try (DataInputStream input = new DataInputStream(socket.getInputStream());
                  DataOutputStream output = new DataOutputStream(socket.getOutputStream())) {
-                for (int i = 0; i < requestsCount; ++i) {
+                while (true) {
                     Protocol.Array array = Utils.readArray(input);
+                    if (array == null) {
+                        break;
+                    }
+                    testResult.addTest();
                     long startTime = System.currentTimeMillis();
                     Protocol.Array result = Utils.sort(array, testResult);
                     testResult.addHandleTime((int) (System.currentTimeMillis() - startTime));

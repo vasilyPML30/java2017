@@ -1,7 +1,7 @@
 package net.netau.vasyoid.clients;
 
-import net.netau.vasyoid.Protocol;
-import net.netau.vasyoid.Utils;
+import net.netau.vasyoid.utils.Protocol;
+import net.netau.vasyoid.utils.Utils;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -10,12 +10,12 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class ClientsManager {
+public class ClientManager {
 
-    public static int CLIENT_MANAGER_PORT = 111111;
+    public static int CLIENT_MANAGER_PORT = 22222;
     private static long averageClientTime;
 
-    public static void addClientTime(long time) {
+    public static synchronized void addClientTime(long time) {
         averageClientTime += time;
     }
 
@@ -23,6 +23,9 @@ public class ClientsManager {
         try (DataInputStream input = new DataInputStream(socket.getInputStream());
              DataOutputStream output = new DataOutputStream(socket.getOutputStream())) {
             Protocol.TestTask task = Utils.readTestTask(input);
+            if (task == null) {
+                return;
+            }
             Thread[] threads = new Thread[task.getClientsCount()];
             averageClientTime = 0;
             for (int i = 0; i < task.getClientsCount(); ++i) {
@@ -30,13 +33,14 @@ public class ClientsManager {
                         task.getPort(), task.getArraySize(), task.getDelta(),
                         task.getRequestsCount());
                 threads[i] = new Thread(client);
+                threads[i].start();
             }
-            averageClientTime /= task.getClientsCount();
             for (Thread thread : threads) {
                 try {
                     thread.join();
                 } catch (InterruptedException ignored) { }
             }
+            averageClientTime /= task.getClientsCount();
             output.writeInt((int) averageClientTime);
         } catch (IOException e) {
             System.out.println("Could not communicate: " + e.getMessage());

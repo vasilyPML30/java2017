@@ -19,7 +19,7 @@ public abstract class BlockingServer extends Server {
         try {
             for (int i = 0; i < clientsCount; ++i) {
                 Socket socket = serverSocket.accept();
-                proceed(socket, requestsCount);
+                proceed(socket);
             }
         } catch (IOException e) {
             System.out.println("could not establish a connection: " + e.getMessage());
@@ -30,5 +30,5 @@ public abstract class BlockingServer extends Server {
         return testResult;
     }
 
-    protected abstract void proceed(Socket socket, int requestsCount);
+    protected abstract void proceed(Socket socket);
 }

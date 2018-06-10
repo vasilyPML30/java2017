@@ -1,6 +1,7 @@
 package net.netau.vasyoid.clients;
 
-import net.netau.vasyoid.Protocol;
+import net.netau.vasyoid.utils.Protocol;
+import net.netau.vasyoid.utils.Utils;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -43,19 +44,16 @@ public class Client implements Runnable {
                 os.writeInt(size);
                 os.write(request.toByteArray());
                 os.flush();
-                size = is.readInt();
-                byte[] data = new byte[size];
-                //noinspection ResultOfMethodCallIgnored
-                is.read(data);
+                Utils.readArray(is);
+                try {
+                    Thread.sleep(delta);
+                } catch (InterruptedException ignored) { }
             }
             os.writeInt(-1);
             os.flush();
-            try {
-               Thread.sleep(delta);
-            } catch (InterruptedException ignored) { }
         } catch (IOException e) {
             System.out.println("Could not communicate with a server: " + e.getMessage());
         }
-        ClientsManager.addClientTime((startTime - System.currentTimeMillis()) / elementsCount);
+        ClientManager.addClientTime((System.currentTimeMillis() - startTime) / queriesCount);
     }
 }
