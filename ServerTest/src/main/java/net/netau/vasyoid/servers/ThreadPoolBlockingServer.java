@@ -62,6 +62,7 @@ public class ThreadPoolBlockingServer extends BlockingServer {
                         responser.submit(() -> {
                             testResult.addHandleTime(
                                     (int) (System.currentTimeMillis() - startTime));
+                            completedRequests.countDown();
                             try {
                                 Utils.writeMessage(result, output);
                             } catch (IOException e) {
@@ -70,11 +71,11 @@ public class ThreadPoolBlockingServer extends BlockingServer {
                             }
                         });
                     });
-                    completedRequests.countDown();
                 }
             } catch (IOException e) {
                 System.out.println("Could not communicate with a client: " + e.getMessage());
             }
+            responser.shutdown();
         }
     }
 }

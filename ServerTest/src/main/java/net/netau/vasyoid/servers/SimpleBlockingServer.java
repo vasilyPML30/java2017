@@ -46,8 +46,8 @@ public class SimpleBlockingServer extends BlockingServer {
                     long startTime = System.currentTimeMillis();
                     Protocol.Array result = Utils.sort(array, testResult);
                     testResult.addHandleTime((int) (System.currentTimeMillis() - startTime));
-                    Utils.writeMessage(result, output);
                     completedRequests.countDown();
+                    Utils.writeMessage(result, output);
                 }
             } catch (IOException e) {
                 System.out.println("Could not communicate with a client: " + e.getMessage());

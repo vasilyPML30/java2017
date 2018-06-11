@@ -66,11 +66,10 @@ public class ServerManager {
     }
 
     public static void main(String[] args) {
-        Config config = new Config(Server.ServerType.NON_BLOCKING);
+        Config config = new Config(Server.ServerType.THREAD_POOL);
         config.setClientsCount(100);
         config.setRequestsCount(100);
-        config.setElementsCount(100);
-        config.setDelta(1);
+        config.setElementsCount(1000);
         new ServerManager().run(config);
     }
 
