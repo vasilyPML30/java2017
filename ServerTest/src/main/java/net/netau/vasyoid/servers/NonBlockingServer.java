@@ -21,15 +21,12 @@ public class NonBlockingServer extends Server {
     private ServerSocketChannel acceptor;
     private Selector readSelector;
     private Selector writeSelector;
-    private final ExecutorService threadPool;
+    private ExecutorService threadPool;
 
     public NonBlockingServer() {
-        threadPool = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
         try {
             acceptor = ServerSocketChannel.open();
             acceptor.bind(new InetSocketAddress(ServerType.NON_BLOCKING.getPort()));
-            readSelector = Selector.open();
-            writeSelector = Selector.open();
         } catch (IOException e) {
             System.out.println("Could not create a socket: " + e.getMessage());
         }
@@ -37,8 +34,15 @@ public class NonBlockingServer extends Server {
 
     @Override
     public TestResult run(int clientsCount, int requestsCount) {
+        threadPool = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
         testResult = new TestResult();
         completedRequests = new CountDownLatch(clientsCount * requestsCount);
+        try {
+            readSelector = Selector.open();
+            writeSelector = Selector.open();
+        } catch (IOException e) {
+            System.out.println("Could not open a selector: " + e.getMessage());
+        }
         ReadWorker readWorker = new ReadWorker();
         WriteWorker writeWorker = new WriteWorker();
         readWorker.start();
@@ -49,7 +53,9 @@ public class NonBlockingServer extends Server {
                 channel.configureBlocking(false);
                 //noinspection SynchronizeOnNonFinalField
                 synchronized (readSelector) {
-                    channel.register(readSelector, SelectionKey.OP_READ, new Client());
+                    Client client = new Client();
+                    System.out.println("Registering for read: " + client.hashCode());
+                    channel.register(readSelector, SelectionKey.OP_READ, client);
                 }
             }
         } catch (IOException e) {
@@ -110,6 +116,7 @@ public class NonBlockingServer extends Server {
                                 try {
                                     //noinspection SynchronizeOnNonFinalField
                                     synchronized (writeSelector) {
+                                        System.out.println("Registering for write: " + client.hashCode());
                                         channel.register(writeSelector,
                                                 SelectionKey.OP_WRITE, client);
                                     }
@@ -153,6 +160,7 @@ public class NonBlockingServer extends Server {
                             key.cancel();
                             //noinspection SynchronizeOnNonFinalField
                             synchronized (readSelector) {
+                                System.out.println("Registering for read: " + client.hashCode());
                                 channel.register(readSelector, SelectionKey.OP_READ, client);
                             }
                         }

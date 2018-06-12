@@ -9,6 +9,8 @@ public abstract class Server {
 
     public abstract TestResult run(int clientsCount, int requestsCount);
 
+    public abstract void close();
+
     public static Server newServer(ServerType type) {
         switch (type) {
             case SIMPLE:
@@ -19,8 +21,6 @@ public abstract class Server {
                 return new NonBlockingServer();
         }
     }
-
-    public abstract void close();
 
     public static class TestResult {
         private long sortTime = 0;

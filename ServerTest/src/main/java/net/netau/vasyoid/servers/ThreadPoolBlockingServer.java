@@ -12,10 +12,9 @@ public class ThreadPoolBlockingServer extends BlockingServer {
 
     private static final int THREAD_POOL_SIZE = 4;
 
-    private final ExecutorService threadPool;
+    private ExecutorService threadPool;
 
     public ThreadPoolBlockingServer() {
-        threadPool = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
         try {
             acceptor = new ServerSocket(ServerType.THREAD_POOL.getPort(),
                     Integer.MAX_VALUE, ADDRESS);
@@ -26,6 +25,7 @@ public class ThreadPoolBlockingServer extends BlockingServer {
 
     @Override
     public TestResult run(int clientsCount, int requestsCount) {
+        threadPool = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
         TestResult result = super.run(clientsCount, requestsCount);
         threadPool.shutdown();
         return result;

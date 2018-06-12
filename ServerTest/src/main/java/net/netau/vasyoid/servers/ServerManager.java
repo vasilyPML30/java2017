@@ -15,17 +15,15 @@ import java.util.List;
 public class ServerManager {
 
     private static Server.TestResult completeTask(Protocol.TestTask testTask,
-                                           Server.ServerType serverType) {
+                                           Server server) {
         Server.TestResult result = new Server.TestResult();
         try (Socket socket = new Socket(InetAddress.getLoopbackAddress(),
                 ClientManager.CLIENT_MANAGER_PORT);
              DataInputStream is = new DataInputStream(socket.getInputStream());
              DataOutputStream os = new DataOutputStream(socket.getOutputStream())) {
             Thread serverThread = new Thread(() -> {
-                    Server server = Server.newServer(serverType);
                     result.addResult(server.run(testTask.getClientsCount(),
                     testTask.getRequestsCount()));
-            //        server.close();
             });
             serverThread.start();
             Utils.writeMessage(testTask, os);
@@ -39,10 +37,8 @@ public class ServerManager {
     }
 
     public static List<Server.TestResult> run(Config config) {
-        config.setClientsCount(100);
-        config.setRequestsCount(100);
-        config.setElementsCount(1000);
         List<Server.TestResult> results = new ArrayList<>();
+        Server server = Server.newServer(config.serverType);
         for (int clientsCount = config.clientsCountMin;
              clientsCount <= config.clientsCountMax;
              clientsCount += config.clientsCountStride) {
@@ -59,10 +55,11 @@ public class ServerManager {
                             .setPort(config.serverType.getPort())
                             .setRequestsCount(config.requestsCount)
                             .build();
-                    results.add(completeTask(testTask, config.serverType));
+                    results.add(completeTask(testTask, server));
                 }
             }
         }
+        server.close();
         return results;
     }
 

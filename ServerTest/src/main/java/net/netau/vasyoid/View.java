@@ -88,7 +88,7 @@ public class View extends Application {
             config.setElementsCount(nChooser.getValue());
             config.setClientsCount(mChooser.getValue());
             config.setDelta(dChooser.getValue());
-            /*switch (variableParameterChooser.getSelectionModel().getSelectedIndex()) {
+            switch (variableParameterChooser.getSelectionModel().getSelectedIndex()) {
                 case 0:
                     config.setElementsCount(minValueChooser.getValue(),
                             maxValueChooser.getValue(), strideChooser.getValue());
@@ -102,7 +102,6 @@ public class View extends Application {
                             maxValueChooser.getValue(), strideChooser.getValue());
                     break;
             }
-            */
             System.out.println(config);
             System.out.printf("Sort time:    Handle time:    Client time:\n");
             List<Server.TestResult> results = ServerManager.run(config);
@@ -112,7 +111,11 @@ public class View extends Application {
                         result.getAverageHandleTime(),
                         result.getAverageClientTime());
             }
-
+            Stage stage = new Stage();
+            stage.setTitle("My New Stage Title");
+            Label label = new Label("PLOT");
+            stage.setScene(new Scene(label, 450, 450));
+            stage.show();
         });
 
         pane.getChildren().addAll(
