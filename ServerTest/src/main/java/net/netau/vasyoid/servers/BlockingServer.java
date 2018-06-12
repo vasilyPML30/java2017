@@ -10,7 +10,7 @@ public abstract class BlockingServer extends Server {
 
     protected static final InetAddress ADDRESS = InetAddress.getLoopbackAddress();
 
-    protected ServerSocket serverSocket;
+    protected ServerSocket acceptor;
 
     @Override
     public TestResult run(int clientsCount, int requestsCount) {
@@ -18,11 +18,11 @@ public abstract class BlockingServer extends Server {
         completedRequests = new CountDownLatch(clientsCount * requestsCount);
         try {
             for (int i = 0; i < clientsCount; ++i) {
-                Socket socket = serverSocket.accept();
+                Socket socket = acceptor.accept();
                 proceed(socket);
             }
         } catch (IOException e) {
-            System.out.println("could not establish a connection: " + e.getMessage());
+            System.out.println("Could not establish a connection: " + e.getMessage());
         }
         try {
             completedRequests.await();
@@ -31,4 +31,13 @@ public abstract class BlockingServer extends Server {
     }
 
     protected abstract void proceed(Socket socket);
+
+    @Override
+    public void close() {
+        try {
+            acceptor.close();
+        } catch (IOException e) {
+            System.out.println("Could not close a server socket: " + e.getMessage());
+        }
+    }
 }

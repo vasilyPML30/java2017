@@ -17,7 +17,7 @@ public class ThreadPoolBlockingServer extends BlockingServer {
     public ThreadPoolBlockingServer() {
         threadPool = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
         try {
-            serverSocket = new ServerSocket(ServerType.THREAD_POOL.getPort(),
+            acceptor = new ServerSocket(ServerType.THREAD_POOL.getPort(),
                     Integer.MAX_VALUE, ADDRESS);
         } catch (IOException e) {
             System.out.println("Could not create a server socket: " + e.getMessage());

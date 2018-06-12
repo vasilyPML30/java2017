@@ -66,6 +66,15 @@ public class NonBlockingServer extends Server {
         return testResult;
     }
 
+    @Override
+    public void close() {
+        try {
+            acceptor.close();
+        } catch (IOException e) {
+            System.out.println("Could not close a server socket channel: " + e.getMessage());
+        }
+    }
+
     private class ReadWorker extends Thread {
 
         @Override

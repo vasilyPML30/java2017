@@ -14,17 +14,18 @@ import java.util.List;
 
 public class ServerManager {
 
-    private Server.TestResult completeTask(Protocol.TestTask testTask,
+    private static Server.TestResult completeTask(Protocol.TestTask testTask,
                                            Server.ServerType serverType) {
         Server.TestResult result = new Server.TestResult();
         try (Socket socket = new Socket(InetAddress.getLoopbackAddress(),
                 ClientManager.CLIENT_MANAGER_PORT);
              DataInputStream is = new DataInputStream(socket.getInputStream());
              DataOutputStream os = new DataOutputStream(socket.getOutputStream())) {
-            Server server = Server.newServer(serverType);
             Thread serverThread = new Thread(() -> {
-                result.addResult(server.run(testTask.getClientsCount(),
-                        testTask.getRequestsCount()));
+                    Server server = Server.newServer(serverType);
+                    result.addResult(server.run(testTask.getClientsCount(),
+                    testTask.getRequestsCount()));
+            //        server.close();
             });
             serverThread.start();
             Utils.writeMessage(testTask, os);
@@ -34,13 +35,13 @@ public class ServerManager {
         } catch (IOException e) {
             System.out.println("Could not communicate with a client: " + e.getMessage());
         } catch (InterruptedException ignored) { }
-        System.err.println("sort: " + result.getAverageSortTime());
-        System.err.println("handle: " + result.getAverageHandleTime());
-        System.err.println("client: " + result.getAverageClientTime());
         return result;
     }
 
-    public List<Server.TestResult> run(Config config) {
+    public static List<Server.TestResult> run(Config config) {
+        config.setClientsCount(100);
+        config.setRequestsCount(100);
+        config.setElementsCount(1000);
         List<Server.TestResult> results = new ArrayList<>();
         for (int clientsCount = config.clientsCountMin;
              clientsCount <= config.clientsCountMax;
@@ -65,14 +66,6 @@ public class ServerManager {
         return results;
     }
 
-    public static void main(String[] args) {
-        Config config = new Config(Server.ServerType.THREAD_POOL);
-        config.setClientsCount(100);
-        config.setRequestsCount(100);
-        config.setElementsCount(1000);
-        new ServerManager().run(config);
-    }
-
     public static class Config {
         private int clientsCountMin = 100, clientsCountMax = 100, clientsCountStride = 1;
         private int elementsCountMin = 100, elementsCountMax = 100, elementsCountStride = 1;
@@ -80,7 +73,37 @@ public class ServerManager {
         private int requestsCount = 100;
         private Server.ServerType serverType;
 
-        Config(Server.ServerType serverType) {
+        @Override
+        public String toString() {
+            StringBuilder result = new StringBuilder();
+            result.append("Server ").append(serverType);
+            result.append("\nX ").append(requestsCount);
+            result.append("\nN ").append(elementsCountMin);
+            if (elementsCountMin != elementsCountMax) {
+                result.append(" .. ")
+                        .append(elementsCountMax)
+                        .append(", ")
+                        .append(elementsCountStride);
+            }
+            result.append("\nM ").append(clientsCountMin);
+            if (clientsCountMin != clientsCountMax) {
+                result.append(" .. ")
+                        .append(clientsCountMax)
+                        .append(", ")
+                        .append(clientsCountStride);
+            }
+            result.append("\nD ").append(deltaMin);
+            if (deltaMin != deltaMax) {
+                result.append(" .. ")
+                        .append(deltaMax)
+                        .append(", ")
+                        .append(deltaStride);
+            }
+            result.append("\n");
+            return result.toString();
+        }
+
+        public Config(Server.ServerType serverType) {
             this.serverType = serverType;
         }
 
@@ -119,10 +142,6 @@ public class ServerManager {
 
         public void setRequestsCount(int value) {
             requestsCount = value;
-        }
-
-        public void setServerType(Server.ServerType serverType) {
-            this.serverType = serverType;
         }
 
     }

@@ -20,6 +20,8 @@ public abstract class Server {
         }
     }
 
+    public abstract void close();
+
     public static class TestResult {
         private long sortTime = 0;
         private long handleTime = 0;

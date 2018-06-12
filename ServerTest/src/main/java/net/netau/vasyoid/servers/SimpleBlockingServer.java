@@ -11,7 +11,7 @@ public class SimpleBlockingServer extends BlockingServer {
 
     public SimpleBlockingServer() {
         try {
-            serverSocket = new ServerSocket(ServerType.SIMPLE.getPort(),
+            acceptor = new ServerSocket(ServerType.SIMPLE.getPort(),
                     Integer.MAX_VALUE, ADDRESS);
         } catch (IOException e) {
             System.out.println("Could not create a server socket: " + e.getMessage());

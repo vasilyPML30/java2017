@@ -64,30 +64,4 @@ public class Utils {
         output.write(message.toByteArray());
         output.flush();
     }
-
-    private static void sort(List<Integer> arr) {
-        for (int i = 0; i < arr.size(); ++i) {
-            for (int j = i + 1; j < arr.size(); ++j) {
-                if (arr.get(i) > arr.get(j)) {
-                    Collections.swap(arr, i, j);
-                }
-            }
-        }
-    }
-
-    public static void main(String[] args) {
-        int size = 1000;
-        int n = 100;
-        List<Integer> arr = new ArrayList<>();
-        Random rnd = new Random();
-        for (int i = 0; i < size; ++i) {
-            arr.add(rnd.nextInt());
-        }
-        for (int j = 0; j < n; ++j) {
-            long startTime = System.currentTimeMillis();
-            sort(arr);
-            System.out.println(System.currentTimeMillis() - startTime);
-        }
-    }
-
 }
