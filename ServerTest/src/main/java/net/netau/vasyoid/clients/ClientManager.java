@@ -50,7 +50,7 @@ public class ClientManager {
     public static void main(String[] args) {
         try (ServerSocket serverSocket =
                      new ServerSocket(CLIENT_MANAGER_PORT, Integer.MAX_VALUE,
-                             InetAddress.getLoopbackAddress())) {
+                             InetAddress.getByName(args[0]))) {
             //noinspection InfiniteLoopStatement
             while (true) {
                 Socket socket = serverSocket.accept();

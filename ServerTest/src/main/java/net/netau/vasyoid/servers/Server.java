@@ -23,6 +23,7 @@ public abstract class Server {
     }
 
     public static class TestResult {
+
         private long sortTime = 0;
         private long handleTime = 0;
         private int clientTime = 0;

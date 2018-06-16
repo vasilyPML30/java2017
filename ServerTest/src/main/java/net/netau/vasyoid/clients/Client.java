@@ -12,6 +12,7 @@ import java.util.Random;
 
 public class Client implements Runnable {
 
+    private static int index = 0;
     private final InetAddress address;
     private final int port;
     private final int elementsCount;
@@ -55,5 +56,6 @@ public class Client implements Runnable {
             System.out.println("Could not communicate with a server: " + e.getMessage());
         }
         ClientManager.addClientTime((System.currentTimeMillis() - startTime) / queriesCount);
+        System.out.println("finished: " + index++);
     }
 }

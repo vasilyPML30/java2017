@@ -11,20 +11,21 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class ServerManager {
 
-    private static Server.TestResult completeTask(Protocol.TestTask testTask,
-                                           Server server) {
+    private static Server.TestResult completeTask(Protocol.TestTask testTask, Server server,
+                                                  InetAddress clientAddress) {
         Server.TestResult result = new Server.TestResult();
-        try (Socket socket = new Socket(InetAddress.getLoopbackAddress(),
+        try (Socket socket = new Socket(clientAddress,
                 ClientManager.CLIENT_MANAGER_PORT);
              DataInputStream is = new DataInputStream(socket.getInputStream());
              DataOutputStream os = new DataOutputStream(socket.getOutputStream())) {
-            Thread serverThread = new Thread(() -> {
+            Thread serverThread = new Thread(() ->
                     result.addResult(server.run(testTask.getClientsCount(),
-                    testTask.getRequestsCount()));
-            });
+                    testTask.getRequestsCount()))
+            );
             serverThread.start();
             Utils.writeMessage(testTask, os);
             serverThread.join();
@@ -36,7 +37,7 @@ public class ServerManager {
         return result;
     }
 
-    public static List<Server.TestResult> run(Config config) {
+    public static List<Server.TestResult> run(Config config, InetAddress clientAddress) {
         List<Server.TestResult> results = new ArrayList<>();
         Server server = Server.newServer(config.serverType);
         for (int clientsCount = config.clientsCountMin;
@@ -55,7 +56,7 @@ public class ServerManager {
                             .setPort(config.serverType.getPort())
                             .setRequestsCount(config.requestsCount)
                             .build();
-                    results.add(completeTask(testTask, server));
+                    results.add(completeTask(testTask, server, clientAddress));
                 }
             }
         }
@@ -64,9 +65,11 @@ public class ServerManager {
     }
 
     public static class Config {
+
         private int clientsCountMin = 100, clientsCountMax = 100, clientsCountStride = 1;
         private int elementsCountMin = 100, elementsCountMax = 100, elementsCountStride = 1;
         private int deltaMin = 100, deltaMax = 100, deltaStride = 100;
+        private int parameterMin = 100, parameterMax = 100, parameterStride = 1;
         private int requestsCount = 100;
         private Server.ServerType serverType;
 
@@ -141,5 +144,45 @@ public class ServerManager {
             requestsCount = value;
         }
 
+        public Server.ServerType getServerType() {
+            return serverType;
+        }
+
+        private int[] parseValues(String string) {
+            int[] result = new int[3];
+            if (string.contains("..")) {
+                String[] parts = string.split(",|\\.|\\s");
+                result[0] = Integer.parseInt(parts[1]);
+                result[1] = Integer.parseInt(parts[5]);
+                result[2] = Integer.parseInt(parts[7]);
+                parameterMin = result[0];
+                parameterMax = result[1];
+                parameterStride = result[2];
+            } else {
+                result[0] = result[1] = Integer.parseInt(string.substring(2));
+                result[2] = 1;
+            }
+            return result;
+        }
+
+        public void read(Scanner in) {
+            in.nextLine();
+            int[] values = parseValues(in.nextLine());
+            setRequestsCount(values[0]);
+            values = parseValues(in.nextLine());
+            setElementsCount(values[0], values[1], values[2]);
+            values = parseValues(in.nextLine());
+            setClientsCount(values[0], values[1], values[2]);
+            values = parseValues(in.nextLine());
+            setDelta(values[0], values[1], values[2]);
+        }
+
+        public int getParameterMin() {
+            return parameterMin;
+        }
+
+        public int getParameterStride() {
+            return parameterStride;
+        }
     }
 }
