@@ -126,15 +126,4 @@ public class FtpServerTest {
         assertArrayEquals(expected, actual);
     }
 
-    @Test
-    public void getLargeFileTest() throws Exception {
-        byte[] expected = createFileAndSendQuery(1 << 20);
-        assertEquals(expected.length, is.readLong());
-        byte[] actual = new byte[expected.length];
-        for (int i = 0; i < expected.length / 1024; ++i) {
-            assertEquals(1024, is.read(actual, i * 1024, 1024));
-        }
-        assertArrayEquals(expected, actual);
-    }
-
 }
