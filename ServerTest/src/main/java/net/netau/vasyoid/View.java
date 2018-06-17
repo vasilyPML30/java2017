@@ -26,7 +26,7 @@ public class View extends Application {
 
     public static void main(String[] args) {
         try {
-            clientAddress = InetAddress.getByName(args[1]);
+            clientAddress = InetAddress.getByName(args[0]);
         } catch (UnknownHostException e) {
             System.out.println("Unknown host: " + e.getMessage());
         }

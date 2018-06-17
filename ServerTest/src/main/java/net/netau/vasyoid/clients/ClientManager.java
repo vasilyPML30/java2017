@@ -48,9 +48,7 @@ public class ClientManager {
     }
 
     public static void main(String[] args) {
-        try (ServerSocket serverSocket =
-                     new ServerSocket(CLIENT_MANAGER_PORT, Integer.MAX_VALUE,
-                             InetAddress.getByName(args[0]))) {
+        try (ServerSocket serverSocket = new ServerSocket(CLIENT_MANAGER_PORT)) {
             //noinspection InfiniteLoopStatement
             while (true) {
                 Socket socket = serverSocket.accept();
