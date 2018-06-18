@@ -94,13 +94,4 @@ public class FtpClientTest {
         Files.delete(new File(file.getName()).toPath());
     }
 
-    @Test
-    public void getLargeFileTest() throws Exception {
-        File file = temporaryFolder.newFile("...file...");
-        byte[] expected = createFile(file, (int) 1e6);
-        assertEquals(file.getName(), client.get(file.getAbsolutePath()).getPath());
-        assertArrayEquals(expected, Files.readAllBytes(new File(file.getName()).toPath()));
-        Files.delete(new File(file.getName()).toPath());
-    }
-
 }

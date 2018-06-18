@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+option java_package = "net.netau.vasyoid.utils";
+
+option java_outer_classname = "Protocol";
+
+message Array {
+    required int32 elementsCount = 1;
+    repeated int32 element = 2;
+}
+
+message TestTask {
+    required int32 port = 1;
+    required int32 arraySize = 2;
+    required int32 clientsCount = 3;
+    required int32 delta = 4;
+    required int32 requestsCount = 5;
+}
