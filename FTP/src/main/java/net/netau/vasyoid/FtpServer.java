@@ -19,7 +19,6 @@ public class FtpServer implements AutoCloseable, Runnable {
 
     private final static int BUFFER_SIZE = 1024;
 
-
     private final ServerSocket serverSocket;
     private FtpException exception = null;
 
@@ -86,6 +85,35 @@ public class FtpServer implements AutoCloseable, Runnable {
             this.socket = socket;
         }
 
+        private void list(@NotNull DataInputStream input,
+                          @NotNull DataOutputStream output) throws IOException {
+            File directory = new File(input.readUTF());
+            File[] files = directory.listFiles();
+            output.writeInt(files == null ? 0 : files.length);
+            if (files != null) {
+                for (File file : files) {
+                    output.writeUTF(file.getName());
+                    output.writeBoolean(file.isDirectory());
+                }
+            }
+            output.flush();
+        }
+
+        private void get(@NotNull DataInputStream input,
+                         @NotNull DataOutputStream output) throws IOException {
+            File file = new File(input.readUTF());
+            output.writeLong(file.length());
+            if (file.exists()) {
+                FileInputStream fileInput = new FileInputStream(file);
+                byte[] buffer = new byte[BUFFER_SIZE];
+                int readLength;
+                while ((readLength = fileInput.read(buffer, 0, BUFFER_SIZE)) > 0) {
+                    output.write(buffer, 0, readLength);
+                }
+                fileInput.close();
+            }
+        }
+
         /**
          * {@inheritDoc}
          * Main loop.
@@ -94,33 +122,19 @@ public class FtpServer implements AutoCloseable, Runnable {
         public void run() {
             try (DataInputStream input = new DataInputStream(socket.getInputStream());
                  DataOutputStream output = new DataOutputStream(socket.getOutputStream())) {
-                while (!Thread.interrupted()) {
+                boolean isRunning = true;
+                while (!Thread.interrupted() && isRunning) {
                     int queryType = input.readInt();
-                    if (queryType == STOP_QUERY_TYPE) {
-                        break;
-                    } else if (queryType == LIST_QUERY_TYPE) {
-                        File directory = new File(input.readUTF());
-                        File[] files = directory.listFiles();
-                        output.writeInt(files == null ? 0 : files.length);
-                        if (files != null) {
-                            for (File file : files) {
-                                output.writeUTF(file.getName());
-                                output.writeBoolean(file.isDirectory());
-                            }
-                        }
-                        output.flush();
-                    } else if (queryType == GET_QUERY_TYPE) {
-                        File file = new File(input.readUTF());
-                        output.writeLong(file.length());
-                        if (file.exists()) {
-                            FileInputStream fileInput = new FileInputStream(file);
-                            byte[] buffer = new byte[BUFFER_SIZE];
-                            int readLength;
-                            while ((readLength = fileInput.read(buffer, 0, BUFFER_SIZE)) > 0) {
-                                output.write(buffer, 0, readLength);
-                            }
-                            fileInput.close();
-                        }
+                    switch (queryType) {
+                        case LIST_QUERY_TYPE:
+                            list(input, output);
+                            break;
+                        case GET_QUERY_TYPE:
+                            get(input, output);
+                            break;
+                        default:
+                            isRunning = false;
+                            break;
                     }
                 }
             } catch (IOException e) {
