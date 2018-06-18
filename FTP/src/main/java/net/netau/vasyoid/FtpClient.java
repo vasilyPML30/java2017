@@ -15,8 +15,7 @@ import java.util.List;
  */
 public class FtpClient implements AutoCloseable {
 
-    private static final int BUFFER_SIZE = 1024;
-
+    private final static int BUFFER_SIZE = 1024;
     private final Socket socket;
     private final DataInputStream input;
     private final DataOutputStream output;
@@ -79,6 +78,9 @@ public class FtpClient implements AutoCloseable {
      */
     @NotNull
     public List<MyFile> list(@NotNull String path) throws FtpException {
+        if (path.isEmpty()) {
+            path = ".";
+        }
         sendQuery(FtpServer.LIST_QUERY_TYPE, path);
         try {
             List<MyFile> result = new ArrayList<>();
